@@ -1,20 +1,20 @@
 """
- Copyright 2018 - by Jerome Tubiana (jertubiana@gmail.com)
+ Copyright 2020 - by Jerome Tubiana (jertubiana@gmail.com)
      All rights reserved
-     
+
      Permission is granted for anyone to copy, use, or modify this
-     software for any uncommercial purposes, provided this copyright 
-     notice is retained, and note is made of any changes that have 
-     been made. This software is distributed without any warranty, 
-     express or implied. In no event shall the author or contributors be 
+     software for any uncommercial purposes, provided this copyright
+     notice is retained, and note is made of any changes that have
+     been made. This software is distributed without any warranty,
+     express or implied. In no event shall the author or contributors be
      liable for any damage arising out of the use of this software.
-     
-     The publication of research using this software, modified or not, must include 
+
+     The publication of research using this software, modified or not, must include
      appropriate citations to:
 """
 
 import matplotlib
-matplotlib.use('agg')
+# matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as patches
@@ -22,7 +22,10 @@ import sys,os
 
 import numpy as np
 import Proteins_utils
-import Proteins_3D_utils
+try:
+    import Proteins_3D_utils
+except:
+    print('Missing packages for importing Proteins_3D_utils')
 import RBM_utils
 import sequence_logo
 import matplotlib.image as mpimg
@@ -47,11 +50,11 @@ def get_ax(ax,i,nrows,ncols):
 
 def clean_ax(ax):
     ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)        
+    ax.spines['left'].set_visible(False)
     ax.spines['top'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)        
+    ax.spines['bottom'].set_visible(False)
     ax.set_xticks([])
-    ax.set_yticks([])        
+    ax.set_yticks([])
 
 
 
@@ -85,7 +88,7 @@ def plot_input_mean(RBM,I, subset, I_range=None,mean=None,weights = None, ax = N
 
     for i in range(nfeatures):
         ax_ = get_ax(ax,i,nrows,ncols)
-        ax2_ = ax_.twinx()    
+        ax2_ = ax_.twinx()
         ax2_.hist(I[:,subset[i]],normed=True,weights=weights,bins=100)
         ax_.plot(I_range,mean[:,subset[i]],c='black',linewidth=2)
 
@@ -136,12 +139,11 @@ def plot_input_mean(RBM,I, subset, I_range=None,mean=None,weights = None, ax = N
 
 
 
-def plot_input_classes(subset,I_background, I_test, labels, n_class=None, label_names=None, label_background = 'MSA',
+def plot_input_classes(subset,I_background, I_test, class_names=None, background_name = 'MSA',
                 colors = None, xlabels = None , markers = None, beta_order=False,show=True,fontsize=10,nbins=10,ncols=1,ymax=None):
-    if n_class is None:
-        n_class = labels.max()+1
-    if label_names is None:
-        label_names = ['Class %s'%i for i in range(n_class)]
+    n_class = len(I_test)
+    if class_names is None:
+        class_names = ['Class %s'%i for i in range(n_class)]
     if colors is None:
         colors = ['C%s'%(i%10) for i in range(n_class)]
 
@@ -154,10 +156,10 @@ def plot_input_classes(subset,I_background, I_test, labels, n_class=None, label_
     fig.set_figheight(nrows * 3)
     fig.set_figwidth(ncols * 3)
 
-    all_labels = [label_background] + label_names
+    all_labels = [background_name] + class_names
     if xlabels is None:
         xlabels = [r'$I_{%s}$'%(i+1) for i in range(nfeatures)]
-    
+
     for i in range(nfeatures):
         ax_ = get_ax(ax,i,nrows,ncols)
         ax2_ = ax_.twinx()
@@ -165,12 +167,11 @@ def plot_input_classes(subset,I_background, I_test, labels, n_class=None, label_
         col = i%ncols
 
         all_hists = []
-        ax_.hist(I_background[:,subset[i]],color='black',bins=100,normed=True, histtype='bar',alpha=0.25,label=label_background)
+        ax_.hist(I_background[:,subset[i]],color='black',bins=100,normed=True, histtype='bar',alpha=0.25,label=background_name)
         F = patches.Rectangle((0,0),1,1,facecolor='black',alpha=0.25)
         all_hists.append(F)
         for k in range(n_class):
-            subset_class = (labels == k)
-            ax2_.hist(I_test[subset_class,subset[i]],color=colors[k],normed=True, histtype='step',label=label_names[k],bins=nbins[k])
+            ax2_.hist(I_test[k][:,subset[i]],color=colors[k],normed=True, histtype='step',label=class_names[k],bins=nbins[k])
             F = patches.Rectangle((0,0),1,1,facecolor=colors[k])
             all_hists.append(F)
         ax_.set_xlabel(xlabels[i],fontsize=14)
@@ -179,45 +180,51 @@ def plot_input_classes(subset,I_background, I_test, labels, n_class=None, label_
         if ymax is not None:
             ax_.set_ylim([0,ymax[i]])
         if row==0:
-            ax_.legend(all_hists[ (col*(n_class+1))/ncols : ((col+1)*(n_class+1))/ncols ] , all_labels[ (col*(n_class+1))/ncols : ((col+1)*(n_class+1))/ncols ] ,fontsize=fontsize,frameon=False,ncol=1)
+            ax_.legend(all_hists[ (col*(n_class+1))//ncols : ((col+1)*(n_class+1))//ncols ] , all_labels[ (col*(n_class+1))//ncols : ((col+1)*(n_class+1))//ncols ] ,fontsize=fontsize,frameon=False,ncol=1)
         for line in all_hists:
             line.set_visible(False)
     for i in range(nfeatures,ncols*nrows):
         ax_ = get_ax(ax,i,nrows,ncols)
-        clean_ax(ax_)        
+        clean_ax(ax_)
 
     plt.tight_layout()
     if show:
-        plt.show()    
+        plt.show()
     return fig
 
 
-def plot_input_classes_scatter(subsets,I_background, I_test, labels, n_class=None, label_names=None,
-                  label_background = 'MSA',figsize=8,colors = None, axis_labels = None ,
-                  markers = None,show=True,markersize=3,fontsize=10,ncols=1,ncols_legend=1,
+def plot_input_classes_scatter(subsets,I_background, I_classes, class_names=None,
+                  background_name = 'MSA',figsize=8,class_colors = None, axis_labels = None ,
+                  markers = None,show=True,background_markersize=0.5,markersize=3,fontsize=10,ncols=1,ncols_legend=1,
                  xlim = None,ylim=None):
-    if n_class is None:
-        n_class = labels.max()+1
-    if label_names is None:
-        label_names = ['Class %s'%i for i in range(n_class)]
-    if colors is None:
-        colors = ['C%s'%(i%10) for i in range(n_class)]
-        
+
+    n_class = len(I_classes)
+
+    if class_names is None:
+        class_names = ['Class %s'%i for i in range(n_class)]
+    if class_colors is None:
+        class_colors = ['C%s'%(i%10) for i in range(n_class)]
+
     if markers is None:
         markers = ['o' for i in range(n_class)]
-        
+
+
+    try:
+        x = subsets[0][0]
+    except:
+        subsets = [subsets]
 
     nfeatures = len(subsets)
     nrows = int(np.ceil(nfeatures/float(ncols)))
     fig, ax = plt.subplots(nrows, ncols)
     if type(figsize) == list:
-        fig.set_figwidth(ncols * figsize[0])        
+        fig.set_figwidth(ncols * figsize[0])
         fig.set_figheight(nrows * figsize[1])
     else:
         fig.set_figheight(nrows * figsize)
         fig.set_figwidth(ncols * figsize)
 
-    all_labels = [label_background] + label_names
+    all_labels = [background_name] + class_names
 
     if axis_labels is None:
         axis_labels = [ [r'$I_{%s}$'%(subset[0]+1), r'$I_{%s}$'%(subset[1]+1) ] for subset in subsets]
@@ -225,28 +232,38 @@ def plot_input_classes_scatter(subsets,I_background, I_test, labels, n_class=Non
     if xlim is None:
         xlim = [None for l in range(nfeatures)]
     if ylim is None:
-        ylim = [None for l in range(nfeatures)]        
-        
+        ylim = [None for l in range(nfeatures)]
+
     for l in range(nfeatures):
         ax_ = get_ax(ax,l,nrows,ncols)
         row = l/ncols
         col = l%ncols
         i = subsets[l][0]
-        j = subsets[l][1]          
+        j = subsets[l][1]
 
         all_scats = []
-        S = ax_.scatter(I_background[:,i],I_background[:,j] ,c='black',s=0.5,label=label_background,alpha=0.25)
+        S = ax_.scatter(I_background[:,i],I_background[:,j] ,c='gray',s=background_markersize,label=background_name,alpha=0.25)
         all_scats.append(S)
         for k in range(n_class):
-            subset_class = (labels == k)
-            S=ax_.scatter(I_test[subset_class,i],I_test[subset_class,j],c=colors[k],s=markersize,label=label_names[k],marker=markers[k]) 
+            S=ax_.scatter(I_classes[k][:,i],I_classes[k][:,j],c=class_colors[k],s=markersize,label=class_names[k],marker=markers[k])
             all_scats.append(S)
 
         ax_.set_xlabel(axis_labels[l][0],fontsize=fontsize)
         ax_.set_ylabel(axis_labels[l][1],fontsize=fontsize)
 
         if row==0:
-            ax_.legend(all_scats[ (col*(n_class+1))/ncols : ((col+1)*(n_class+1))/ncols ] , all_labels[ (col*(n_class+1))/ncols : ((col+1)*(n_class+1))/ncols ] ,fontsize=16,frameon=False,ncol=ncols_legend,markerscale=5.0,handletextpad=0.2)
+            ax_.legend(all_scats[ (col*(n_class+1))//ncols : ((col+1)*(n_class+1))//ncols ] , all_labels[ (col*(n_class+1))//ncols : ((col+1)*(n_class+1))//ncols ] ,fontsize=16,frameon=False,ncol=ncols_legend,markerscale=2.0,handletextpad=0.2,loc='best')
+
+        if xlim[l] is None:
+            mini = I_background[:,i].min()
+            maxi = I_background[:,i].max()
+            xlim[l]  =  [mini- 0.25 * (maxi-mini), maxi+ 0.25 * (maxi-mini)]
+        if ylim[l] is None:
+            mini = I_background[:,j].min()
+            maxi = I_background[:,j].max()
+            ylim[l]  =  [mini- 0.25 * (maxi-mini), maxi+ 0.25 * (maxi-mini)]
+
+
 
         ax_.set_xlim(xlim[l])
         ax_.set_ylim(ylim[l])
@@ -254,11 +271,11 @@ def plot_input_classes_scatter(subsets,I_background, I_test, labels, n_class=Non
 
     for i in range(nfeatures,ncols*nrows):
         ax_ = get_ax(ax,i,nrows,ncols)
-        clean_ax(ax_)        
-                
+        clean_ax(ax_)
+
     plt.tight_layout()
     if show:
-        plt.show()    
+        plt.show()
     return fig
 
 
@@ -317,79 +334,88 @@ def plot_top_activating_distance(RBM, I,data, subset, nseqs = 20,all_distances =
         return fig
 
 
-def make_all_weights(RBM,data,nweights = 10, weights=None,name = 'all_weights.pdf',figsize=None,sort='beta',dpi=200,ticks_every=5):
+def scatter_distance_fitness( Dmins, Fs, colors = None, names = [], ylabel = None,
+                            non_linearity = None, nmax = 200, s1 =14, s2=16, s3=2,s4 =12,figsize=(5,5),
+                             off = 0.15, w = 0.15,xticks = [0,5,10,15], yticks = None, show_points=None):
+
+    n_samples = len(Dmins)
+    if colors is None:
+        colors = ['C%s'%k for k in range(n_samples)]
+    if names is None:
+        names = ['Method %s'%(k+1) for k in range(n_samples)]
+    if ylabel is None:
+        ylabel = 'Likelihood'
+
+    if show_points is None:
+        show_points = [True for k in range(n_samples)]
+
+    if non_linearity is None:
+        non_linearity = lambda x: x
+    nFs = [non_linearity(F) for F in Fs]
+
+    offs = off * (np.arange(n_samples) - (n_samples-1)/2.)
+
+
+    fig , ax = plt.subplots()
+    fig.set_figheight(figsize[0])
+    fig.set_figwidth(figsize[1])
+    fig.subplots_adjust(left=0.2,bottom=0.15)
+
+    subset_synths = [np.argsort(np.random.randn(len(nF)))[:nmax] for nF in nFs]
+
+
+    for l in range(n_samples):
+        if show_points[l]:
+            plt.scatter(Dmins[l][subset_synths[l]]+ offs[l], nFs[l][subset_synths[l]],
+                    marker='o', s = s3, c = colors[l],label=names[l]);
+
+
+    for l in range(n_samples):
+        mu_dist = Dmins[l].mean()
+        mu_nF = nFs[l].mean()
+        covariance = np.cov(Dmins[l],  nFs[l] )
+        lam,v = np.linalg.eigh(covariance)
+
+        ell = patches.Ellipse(xy=(mu_dist, mu_nF),
+                      width=np.sqrt(lam)[0]*2, height=np.sqrt(lam)[1]*2,
+                      angle=np.rad2deg(-np.arccos(v[0, 0])))
+        ell.set_facecolor(colors[l])
+        ell.set_alpha(0.25)
+        ax.add_artist(ell)
+
+
+    ax.set_xticks(xticks)
+    ax.set_xticklabels(xticks,fontsize=s1);
+    ax.set_xlabel('Mutations to closest natural sequence',fontsize=s2)
+    ax.set_ylabel(ylabel,fontsize=s2)
+
+    if yticks is not None:
+        ax.set_yticks( [non_linearity(ytick) for ytick in yticks] )
+        ax.set_yticklabels(yticks,fontsize=s1);
+
+    for tl in ax.get_xticklabels():
+        tl.set_fontsize(s1)
+    for tl in ax.get_yticklabels():
+        tl.set_fontsize(s1)
+    plt.legend(fontsize=s4,frameon=False,loc='lower left',markerscale=2,handletextpad=-0.3);
+    return fig
+
+
+
+def make_all_weights(RBM,data, pdb_file = None, pdb_chain=None, subset=None,name = 'all_weights.pdf',
+    weights_per_page = 10, rows_per_weight = 1, weights=None, gap_at_bottom = None,
+    figsize=None,sort='importance', dpi=None,ticks_every=5,
+    visualize_sector_kwargs={},theta_important=0.4):
+
+    if dpi is None:
+        if pdb_file is not None:
+            dpi = 200
+        else:
+            dpi = 50
+
     mini_name = name[:-4]
     n_h = RBM.n_h
-    I = RBM.vlayer.compute_output(data,RBM.weights)
-    I_min = I.min()
-    I_max = I.max()
-    I_range = np.asarray( (I_max-I_min) * np.arange(0,1+0.01,0.01) + I_min, dtype=curr_float)
-    mean = RBM.hlayer.mean_from_inputs(np.repeat(I_range[:,np.newaxis],n_h,axis=1))
-
-    betas = RBM_utils.get_norm(RBM.weights,include_gaps=True)    
-    if sort == 'beta':
-        order = np.argsort(betas)[::-1]
-    elif sort == 'p':
-        p = Proteins_utils.get_sparsity(RBM.weights,include_gaps=True)
-        order = np.argsort(p)
-    else:
-        order = np.arange(n_h)
-
-    titles = [r'$||W||_2 = %.2f$'%betas[order[i]] for i in range(n_h)]
-    ylabels = ['Weights %s'%(i+1) for i in range(n_h)]
-
-
-    sub = np.argsort(np.random.randn(len(data)))[:1000]
-    all_distances = Proteins_utils.distance(data[sub]).flatten()
-
-    I_ = I.copy()
-    if RBM.hidden == 'dReLU':
-        eta = RBM.hlayer.eta
-        I_ *= np.sign(eta)[np.newaxis,:]
-
-    q = np.percentile(I_,100* (1-20.0/data.shape[0]),axis=0)
-
-    distance_top_features = []
-    for k in range(n_h):
-        subgroup = data[I_[:,k]>q[k]]
-        distance_top_features.append( Proteins_utils.distance(subgroup).flatten() )
-
-    if figsize is None:
-        figsize = (  max(int(0.3 * RBM.n_v), 2)  ,  3)        
-
-
-    n_pages = int(np.ceil(n_h/float(nweights)))
-    for k in range(n_pages):
-        fig = plt.figure(figsize = (figsize[0]+figsize[1],figsize[1]*nweights))
-        gs = gridspec.GridSpec(2*nweights, 2,width_ratios = [figsize[0],figsize[1]])
-
-        for i in range(k*nweights,(k+1)*nweights):
-            ii = i%nweights
-            ax1 = fig.add_subplot(gs[2*ii:2*ii+2, 0])
-            ax2 = fig.add_subplot(gs[2*ii, 1])
-            ax3 = fig.add_subplot(gs[2*ii+1, 1])
-            sequence_logo.Sequence_logo(RBM.weights[order[i]],ax=ax1,
-                ylabel = ylabels[i], title=titles[i]
-                ,ticks_every=ticks_every,ticks_labels_size=14,title_size=20,show=False)
-            plot_input_mean(RBM,I, order[i], I_range=I_range,mean=mean,weights = weights, ax = ax2,xlabels=[''])
-            plot_top_activating_distance(RBM, I, None,order[i], nseqs = 20,all_distances = all_distances, distance_top_features = distance_top_features,ax=ax3,xlabels=[''])
-        plt.tight_layout()
-        fig.savefig(mini_name+'tmp_#%s.png'%k,dpi=dpi)
-        plt.close('all')
-
-    command = 'pdfjoin ' + mini_name+'tmp_#*.png -o %s'%name
-    os.system(command)
-    command = 'rm '+mini_name+'tmp_#*.png'
-    os.system(command)
-    print('Make all weights: Done.')
-    return 'done'
-
-
-def make_all_weights_structure(RBM,data, pdb_file, subset=None, theta_important = 0.33, weights_per_page = 10, rows_per_weight=1, weights=None,name_pdf = 'all_weights.pdf',figsize=None,dpi=200,ticks_every=5, view_point =None, pixel_size=1000,chain=None,with_numbers=True,offset_number=0.1,
-                              draw_structures=True,sort = 'nogaps_norm'):
-    mini_name = name_pdf[:-4]
-    n_h = RBM.n_h
-    I = RBM.vlayer.compute_output(data,RBM.weights)
+    I = RBM.input_hiddens(data)
     I_min = I.min()
     I_max = I.max()
     I_range = np.asarray( (I_max-I_min) * np.arange(0,1+0.01,0.01) + I_min, dtype=curr_float)
@@ -397,17 +423,42 @@ def make_all_weights_structure(RBM,data, pdb_file, subset=None, theta_important 
 
     norms = RBM_utils.get_norm(RBM.weights,include_gaps=True)
 
-    if subset is None:
-        fraction_gap = RBM_utils.get_norm_gaps(RBM.weights)/norms
-        if sort == 'norm':
-            subset = np.argsort(norms)[::-1]
-        elif sort == 'nogaps_norm':
-            subset = np.argsort( norms *   ((fraction_gap<0.4) + 1e-3) )[::-1]
+    if gap_at_bottom is None:
+        if RBM.n_cv == 21:
+            gap_at_bottom = True
         else:
-            subset = np.arange(RBM.n_h)
+            gap_at_bottom = False
 
-    titles = [r'$||W||_2 = %.2f$'%(norms[subset[i]]) for i in range(len(subset))]
-    ylabels = ['Weights %s (%s)'%((i+1),subset[i]) for i in range(len(subset))]
+    if sort == 'norm':
+        sorting_value = norms
+    elif sort == 'p':
+        p = RBM_utils.get_sparsity(RBM.weights,include_gaps=True)
+        sorting_value = - p
+    elif sort == 'jump':
+        jump = RBM_utils.get_hlayer_jump(RBM.weights,positive_only=False)
+        sorting_value = jump
+    elif sort == 'importance':
+        importance = RBM_utils.get_hidden_unit_importance(RBM,data,weights=weights)
+        sorting_value = importance
+    else:
+        sorting_value = np.arange(n_h)
+
+    if gap_at_bottom:
+        gap_fraction = RBM_utils.get_norm_gaps(RBM.weights,a=1)/RBM_utils.get_norm(RBM.weights,a=1)
+        order = np.argsort(sorting_value  + 1000. * (gap_fraction < 0.3) )[::-1]
+    else:
+        order = np.argsort(sorting_value)[::-1]
+
+    if subset is not None:
+        order = subset
+
+    n_h_shown = len(order)
+
+    if sort == 'importance':
+        titles = [r'$\Delta \mathcal{L} = %.3f$'%importance[order[i]] for i in range(n_h_shown)]
+    else:
+        titles = [r'$||W||_2 = %.2f$'%norms[order[i]] for i in range(n_h_shown)]
+    ylabels = ['Weights %s (%s)'%(i+1,order[i]) for i in range(n_h_shown)]
 
     sub = np.argsort(np.random.randn(len(data)))[:1000]
     all_distances = Proteins_utils.distance(data[sub]).flatten()
@@ -425,73 +476,102 @@ def make_all_weights_structure(RBM,data, pdb_file, subset=None, theta_important 
         distance_top_features.append( Proteins_utils.distance(subgroup).flatten() )
 
 
-    structure_folder = mini_name + '_' + 'images_structures/'
+    if pdb_file is not None:
+        structure_folder = mini_name + '_' + 'images_structures/'
+        norm_1 = np.abs(RBM.weights).sum(-1)
+        maxi = norm_1.max(-1)
+        important = norm_1/maxi[:,np.newaxis] > theta_important
+        sectors = [ np.nonzero(important[l])[0] for l in order ]
+        sector_names = ['absolute_%s_order_%s'%(order[i],i+1) for i in range(n_h_shown)]
 
-    norm = np.abs(RBM.weights).sum(-1)
-    maxi = norm.max(-1)
-    important = norm/maxi[:,np.newaxis] > theta_important
-    sectors = [ np.nonzero(important[l])[0] for l in subset ]
-    names_struct_image = ['structure_absolute_%s_subset_%s'%(subset[i],i) for i in range(len(subset))]
-    names_struct_image_full = [structure_folder + pdb_file.split('/')[-1].split('_')[0].split('.')[0]+'_' +  name +'.tga' for name in names_struct_image]
+        if not 'npixels' in visualize_sector_kwargs.keys():
+            visualize_sector_kwargs['npixels'] = 1000
+        if not 'with_numbers' in visualize_sector_kwargs.keys():
+            visualize_sector_kwargs['with_numbers'] = True
+        if not 'with_numbers_every' in visualize_sector_kwargs.keys():
+            visualize_sector_kwargs['with_numbers_every'] = 2
+        if not 'pdb_numbers' in visualize_sector_kwargs.keys():
+            visualize_sector_kwargs['pdb_numbers'] = False
+        if not 'turn' in visualize_sector_kwargs.keys():
+            visualize_sector_kwargs['turn'] = None
+        if not 'chain' in visualize_sector_kwargs.keys():
+            visualize_sector_kwargs['chain'] = None
+        if not 'first_model_only' in visualize_sector_kwargs.keys():
+            visualize_sector_kwargs['first_model_only'] = True
+        if not 'sector_colors' in visualize_sector_kwargs.keys():
+            visualize_sector_kwargs['sector_colors'] = None
+        if not 'chain_colors' in visualize_sector_kwargs.keys():
+            visualize_sector_kwargs['chain_colors'] = None
+        if not 'show_sidechains' in visualize_sector_kwargs.keys():
+            visualize_sector_kwargs['show_sidechains'] = True
 
-    if draw_structures:
-        mapping = None
-        for i in range(len(subset)):
-            mapping=Proteins_3D_utils.visualize_sectors([sectors[i]], pdb_file, structure_folder, names_struct_image[i],
-                          alignment = data, mapping = mapping,
-                          render=True,with_numbers=with_numbers,offset_labels=offset_number,color_mode = 'Chain',view_point = view_point,pixel_size=pixel_size,chain=chain)
+        Proteins_3D_utils.visualize_sectors(sectors, pdb_file, structure_folder,
+                              sector_names = sector_names,
+                              alignment = data, simultaneous = False,  exit = True,
+                              save = True,**visualize_sector_kwargs)
 
     if figsize is None:
-        figsize = (  max(int(0.3 * RBM.n_v/rows_per_weight), 2)  ,  3*rows_per_weight)        
+        figsize = (  max(int(0.3 * RBM.n_v/rows_per_weight), 2)  ,  3*rows_per_weight)
 
 
-    n_pages = int(np.ceil( len(subset)/float(weights_per_page)))
+    n_pages = int(np.ceil( n_h_shown/float(weights_per_page)))
     for k in range(n_pages):
-        if rows_per_weight>1:
+        if (rows_per_weight>1) & (pdb_file is not None):
             fig = plt.figure(figsize = (figsize[0]+1.5*figsize[1],figsize[1]*weights_per_page))
             gs = gridspec.GridSpec(2*weights_per_page*rows_per_weight, 3,width_ratios = [figsize[0],figsize[1]/2,figsize[1]])
-        else:
+        elif (rows_per_weight==1) & (pdb_file is not None):
             fig = plt.figure(figsize = (figsize[0]+2*figsize[1],figsize[1]*weights_per_page))
             gs = gridspec.GridSpec(2*weights_per_page, 3,width_ratios = [figsize[0],figsize[1],figsize[1]])
 
-                
-        
+        elif (rows_per_weight>1) & (pdb_file is None):
+            fig = plt.figure(figsize = (figsize[0]+figsize[1],figsize[1]*weights_per_page))
+            gs = gridspec.GridSpec(2*weights_per_page, 2,width_ratios = [figsize[0],figsize[1]])
+        else:
+            fig = plt.figure(figsize = (figsize[0]+figsize[1],figsize[1]*weights_per_page))
+            gs = gridspec.GridSpec(2*weights_per_page*rows_per_weight, 2,width_ratios = [figsize[0],figsize[1]])
+
+
         for i in range(k*weights_per_page,(k+1)*weights_per_page):
             ii = i%weights_per_page
-            if rows_per_weight>1:
+            if (rows_per_weight>1) & (pdb_file is not None):
                 ax1 = [fig.add_subplot(gs[2*rows_per_weight*ii+2*l:2*rows_per_weight*ii+2*(l+1), 0]) for l in range(rows_per_weight)]
                 ax2 = fig.add_subplot(gs[2*ii*rows_per_weight:(2*ii+1)*rows_per_weight, 1])
                 ax3 = fig.add_subplot(gs[(2*ii+1) * rows_per_weight: 2*(ii+1) * rows_per_weight, 1])
                 ax4 = fig.add_subplot(gs[2*ii * rows_per_weight: 2*(ii+1) * rows_per_weight, 2])
-            else:
+            elif (rows_per_weight==1) & (pdb_file is not None):
                 ax1 = fig.add_subplot(gs[2*ii:2*ii+2, 0])
                 ax2 = fig.add_subplot(gs[2*ii, 1])
                 ax3 = fig.add_subplot(gs[2*ii+1, 1])
                 ax4 = fig.add_subplot(gs[2*ii:2*ii+2, 2])
-            
-                        
+            elif (rows_per_weight>1) & (pdb_file is None):
+                ax1 = [fig.add_subplot(gs[2*rows_per_weight*ii+2*l:2*rows_per_weight*ii+2*(l+1), 0]) for l in range(rows_per_weight)]
+                ax2 = fig.add_subplot(gs[2*ii*rows_per_weight:(2*ii+1)*rows_per_weight, 1])
+                ax3 = fig.add_subplot(gs[(2*ii+1) * rows_per_weight: 2*(ii+1) * rows_per_weight, 1])
+            else:
+                ax1 = fig.add_subplot(gs[2*ii:2*ii+2, 0])
+                ax2 = fig.add_subplot(gs[2*ii, 1])
+                ax3 = fig.add_subplot(gs[2*ii+1, 1])
 
-            sequence_logo.Sequence_logo(RBM.weights[subset[i]],ax=ax1,
+            sequence_logo.Sequence_logo(RBM.weights[order[i]],ax=ax1,
                 ylabel = ylabels[i], title=titles[i]
                 ,ticks_every=ticks_every,ticks_labels_size=14,title_size=20,show=False,nrows=rows_per_weight)
 
-            plot_input_mean(RBM,I, subset[i], I_range=I_range,mean=mean,weights = weights, ax = ax2,xlabels=[r'$I_{%s}$'%(i+1)])
+            plot_input_mean(RBM,I, order[i], I_range=I_range,mean=mean,weights = weights, ax = ax2,xlabels=[r'$I_{%s}$'%(i+1)])
 
-            plot_top_activating_distance(RBM, I, None,subset[i], nseqs = 20,all_distances = all_distances, distance_top_features = distance_top_features,ax=ax3,xlabels=['Hamming Distance'])
-
-            img = mpimg.imread(names_struct_image_full[i])
-            rows = (img.sum(-1) == 255*3).min(1) # Remove white
-            cols = (img.sum(-1) == 255*3).min(0)
-            ax4.imshow(img[~rows,:][:,~cols])
-            ax4.axis('off')
-
-
+            plot_top_activating_distance(RBM, I, None,order[i], nseqs = 20,all_distances = all_distances, distance_top_features = distance_top_features,ax=ax3,xlabels=['Hamming Distance'])
+            if pdb_file is not None:
+                img = mpimg.imread(structure_folder+'sector_' + sector_names[i] + '.png')
+                rows = (img.sum(-1) == 1.*3).min(1) # Remove white
+                cols = (img.sum(-1) == 1.*3).min(0)
+                ax4.imshow(img[~rows,:][:,~cols])
+                ax4.axis('off')
 
         plt.tight_layout()
         fig.savefig(mini_name+'tmp_#%s.png'%k,dpi=dpi)
-        plt.close('all')
+        fig.clear()
+        plt.close(fig)
 
-    command = 'pdfjoin ' + mini_name+'tmp_#*.png -o %s'%name_pdf
+    command = 'pdfjoin ' + mini_name+'tmp_#*.png -o %s'%name
     os.system(command)
     command = 'rm '+mini_name+'tmp_#*.png'
     os.system(command)

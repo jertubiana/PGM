@@ -1,5 +1,5 @@
 """
- Copyright 2018 - by Jerome Tubiana (jertubiana@@gmail.com)
+ Copyright 2020 - by Jerome Tubiana (jertubiana@gmail.com)
      All rights reserved
 
      Permission is granted for anyone to copy, use, or modify this
@@ -19,13 +19,14 @@ import sys
 import pickle
 import os
 sys.path.append('../source/')
-import utilities10 as utilities
+import utilities
 import copy
 import types
 from multiprocessing import Pool
 from functools import partial
-import rbm10 as rbm
-import layer10 as layer
+import rbm
+import layer
+from moi import KMPP_choose_centroids
 
 
 
@@ -95,19 +96,19 @@ pickle.dump(env,open('tmp.data','wb'));"%(path_to_old_package,RBM_old)
     RBM.weights = env['weights'].astype(np.float32)
     RBM.hlayer.recompute_params(which='other')
     os.system('rm %s'%RBM_old)
-    return RBM    
+    return RBM
 
 
-
-def get_norm(W,include_gaps=True):
+def get_norm(W,include_gaps=True,a=2):
     if not include_gaps:
         W_ = W[:,:,:-1]
     else:
         W_ = W
-    return  np.sqrt( (W_**2).sum(-1).sum(-1) )
+    return  ( (np.abs(W_)**a).sum(-1).sum(-1) )**(1./a)
 
-def get_norm_gaps(W):
-    return np.sqrt( (W**2)[:,:,-1].sum(-1) )
+
+def get_norm_gaps(W,a=2):
+    return ( (np.abs(W[:,:,-1])**a).sum(-1) )**(1./a)
 
 def get_sparsity(W,a=3,include_gaps=True):
     if not include_gaps:
@@ -118,11 +119,43 @@ def get_sparsity(W,a=3,include_gaps=True):
     p = ((tmp**a).sum(1))**2/(tmp**(2*a)).sum(1)
     return p/W.shape[1]
 
-def get_hlayer_jump(RBM):
+def get_hlayer_asymmetry(RBM):
+    return np.abs(RBM.hlayer.eta)
+
+def get_hlayer_jump(RBM,positive_only=True):
     if not RBM.hidden == 'dReLU':
         print('get_hlayer_jump not supported for hidden %s'%RBM.hidden)
     else:
-        return RBM.hlayer.delta/( np.sqrt(1+RBM.hlayer.eta)+np.sqrt(1-RBM.hlayer.eta)/RBM.hlayer.gamma  )
+        jump = -(RBM.hlayer.theta_plus+RBM.hlayer.theta_minus)/(np.sqrt(RBM.hlayer.gamma_plus*RBM.hlayer.gamma_minus))
+        if positive_only:
+            return np.maximum(jump , 0)
+        else:
+            return jump
+
+
+def get_hidden_unit_importance(RBM,data,weights=None,Nchains=200,Nthermalize=1000,Nstep=10,Lchains=100,init='data',recompute=False):
+    '''
+    Estimate the hidden unit importance as the difference between the data likelihood of the full RBM and the data likelihood of the where hidden unit has been removed.
+    Estimated by importance sampling (see K. Shimagaki, M. Weigt 2019 for a derivation for Gaussian variables).
+    Delta L takes into account both the norm of the weights and the shape of the non-linearity.
+    Compared to the weight norm, it tends to put lower importance to the “phylogenetic” features, activated by very few sequences.
+    '''
+    if (not recompute) & hasattr(RBM,'hidden_unit_importance'):
+        return RBM.hidden_unit_importance
+    else:
+        if init == 'data':
+            h = RBM.mean_hiddens(data)
+            initial_points = data[KMPP_choose_centroids(h,Nchains)]
+        else:
+            initial_points = []
+
+        data_gen , _ = RBM.gen_data(Nthermalize=Nthermalize,Nchains=Nchains,Nstep=Nstep,Lchains=Lchains,config_init=initial_points)
+
+        cgf = RBM.hlayer.cgf_from_inputs(RBM.input_hiddens(data))
+        cgf_gen = RBM.hlayer.cgf_from_inputs(RBM.input_hiddens(data_gen))
+        DeltaL = utilities.average(cgf,weights=weights) + utilities.logsumexp(-cgf_gen,axis=0) - np.log(len(data_gen))
+        RBM.hidden_unit_importance = DeltaL
+        return DeltaL
 
 
 def get_hidden_input(data,RBM,normed=False,offset=True):
@@ -155,7 +188,7 @@ def conditioned_RBM(RBM, conditions):
         if hasattr(RBM.hlayer,param_name+'0'):
             tmp_RBM.hlayer.__dict__[param_name+'0'] = RBM.hlayer.__dict__[param_name+'0'][remaining].copy()
         if hasattr(RBM.hlayer,param_name+'1'):
-            tmp_RBM.hlayer.__dict__[param_name+'1'] = RBM.hlayer.__dict__[param_name+'1'][remaining].copy()
+            tmp_RBM.hlayer.__dict__[param_name+'1'] = RBM.hlayer.__dict__[param_name+'1'][:,remaining].copy()
     return tmp_RBM
 
 
@@ -171,20 +204,20 @@ def gen_data_lowT(RBM, beta=1, which = 'marginal' ,**generation_options):
 
     elif which == 'marginal':
         if type(beta) == int:
-            tmp_RBM = rbm.RBM(n_v=RBM.n_v, n_h = beta* RBM.n_h,visible=RBM.visible,hidden=RBM.hidden, n_cv = RBM.n_cv, n_ch = RBM.n_ch,interpolate=interpolate)
+            tmp_RBM = rbm.RBM(n_v=RBM.n_v, n_h = beta* RBM.n_h,visible=RBM.visible,hidden=RBM.hidden, n_cv = RBM.n_cv, n_ch = RBM.n_ch,interpolate=RBM.interpolate)
             tmp_RBM.vlayer = copy.deepcopy(RBM.vlayer)
-            for param_name in tmp_RBM.vlayer.params:
+            for param_name in tmp_RBM.vlayer.list_params:
                 tmp_RBM.vlayer.__dict__[param_name] *= beta
             tmp_RBM.weights = np.repeat(RBM.weights,beta,axis=0)
-        for param_name in tmp_RBM.hlayer.params:
-            tmp_RBM.hlayer.__dict__[param_name] = np.repeat(RBM.hlayer.__param__[param_name],beta,axis=0)
-            tmp_RBM.hlayer.__dict__[param_name] = np.repeat(RBM.hlayer.__param__[param_name],beta,axis=0)
+        for param_name in tmp_RBM.hlayer.list_params:
+            tmp_RBM.hlayer.__dict__[param_name] = np.repeat(RBM.hlayer.__dict__[param_name],beta,axis=0)
+            tmp_RBM.hlayer.__dict__[param_name] = np.repeat(RBM.hlayer.__dict__[param_name],beta,axis=0)
             if hasattr(RBM.hlayer,param_name+'0'):
-                tmp_RBM.hlayer.__dict__[param_name+'0'] = np.repeat(RBM.hlayer.__param__[param_name+'0'],beta,axis=0)
-                tmp_RBM.hlayer.__dict__[param_name+'0'] = np.repeat(RBM.hlayer.__param__[param_name+'0'],beta,axis=0)
+                tmp_RBM.hlayer.__dict__[param_name+'0'] = np.repeat(RBM.hlayer.__dict__[param_name+'0'],beta,axis=0)
+                tmp_RBM.hlayer.__dict__[param_name+'0'] = np.repeat(RBM.hlayer.__dict__[param_name+'0'],beta,axis=0)
             if hasattr(RBM.hlayer,param_name+'1'):
-                tmp_RBM.hlayer.__dict__[param_name+'1'] = np.repeat(RBM.hlayer.__param__[param_name+'1'],beta,axis=0)
-                tmp_RBM.hlayer.__dict__[param_name+'1'] = np.repeat(RBM.hlayer.__param__[param_name+'1'],beta,axis=0)
+                tmp_RBM.hlayer.__dict__[param_name+'1'] = np.repeat(RBM.hlayer.__dict__[param_name+'1'],beta,axis=1)
+                tmp_RBM.hlayer.__dict__[param_name+'1'] = np.repeat(RBM.hlayer.__dict__[param_name+'1'],beta,axis=1)
     return tmp_RBM.gen_data(**generation_options)
 
 
@@ -228,13 +261,13 @@ def get_effective_couplings_approx(RBM,data,weights=None):
     J_eff[np.arange(RBM.n_v),np.arange(RBM.n_v)] = 0 # Remove diagonal entries.
     return J_eff
 
-def get_effective_couplings_exact(RBM,data,weights=None,nbins=10,subset = None,pool=None):
+def get_effective_couplings_exact(RBM,data,weights=None,nbins=10,subset = None):#,pool=None):
     N = RBM.n_v
     M = RBM.n_h
     c = RBM.n_cv
     J = np.zeros([N,N,c,c])
-    if pool is None:
-        pool = Pool()
+    # if pool is None:
+    #     pool = Pool()
 
     inputs = []
     if subset is not None:
@@ -246,14 +279,15 @@ def get_effective_couplings_exact(RBM,data,weights=None,nbins=10,subset = None,p
                 inputs.append( i*N + j)
 
     partial_Ker = partial(_Ker_weights_to_couplings_exact,RBM=RBM,data=data,weights=weights,nbins=nbins)
-    res = pool.map(partial_Ker,inputs)
+    # res = pool.map(partial_Ker,inputs)
+    res = list(map(partial_Ker,inputs) ) # Incompatibility between multiprocessing.Pool and numba. Cannot use parallel.
     for x in range( len(inputs) ):
-        i = inputs[x]/N
+        i = inputs[x]//N
         j = inputs[x]%N
         J[i,j] = res[x]
         if j !=i:
             J[j,i] = res[x].T
-    pool.close()
+    # pool.close()
     return J
 
 
@@ -262,7 +296,7 @@ def _Ker_weights_to_couplings_exact(x,RBM,data,weights=None,nbins=10):
     M = RBM.n_h
     c = RBM.n_cv
     Jij = np.zeros([c,c])
-    i = x/N
+    i = x//N
     j = x%N
     L = layer.Layer(N=1,nature=RBM.hidden)
     tmpW = RBM.weights.copy()

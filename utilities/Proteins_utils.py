@@ -1,5 +1,5 @@
 """
- Copyright 2018 - by Jerome Tubiana (jertubiana@@gmail.com)
+ Copyright 2020 - by Jerome Tubiana (jertubiana@gmail.com)
      All rights reserved
 
      Permission is granted for anyone to copy, use, or modify this
@@ -15,6 +15,9 @@
 
 import pandas as pd
 import numpy as np
+import sys
+sys.path.append('../source/')
+from float_precision import curr_float,curr_int
 
 
 aa = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V',  'W', 'Y','-']
@@ -31,8 +34,6 @@ aadict['z'] = -1
 aadict['.'] = -1
 
 
-curr_int = np.int16
-curr_float = np.float32
 
 def aa_color(letter):
     if letter in ['C']:
@@ -113,7 +114,16 @@ def seq2num(string):
 
 
 def num2seq(num):
-    return [''.join([aa[x] for x in num_seq]) for num_seq in num]
+    if num.ndim == 1: ### If input is a single array
+        num = [num]
+        single = True
+    else:
+        single = False
+    sequences = [''.join([aa[x] for x in num_seq]) for num_seq in num]
+    if single:
+        return sequences[0]
+    else:
+        return sequences
 
 
 def distance(MSA,verbose=False):

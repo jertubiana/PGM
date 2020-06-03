@@ -1,3 +1,18 @@
+"""
+ Copyright 2020 - by Jerome Tubiana (jertubiana@gmail.com)
+     All rights reserved
+
+     Permission is granted for anyone to copy, use, or modify this
+     software for any uncommercial purposes, provided this copyright
+     notice is retained, and note is made of any changes that have
+     been made. This software is distributed without any warranty,
+     express or implied. In no event shall the author or contributors be
+     liable for any damage arising out of the use of this software.
+
+     The publication of research using this software, modified or not, must include
+     appropriate citations to:
+"""
+
 import numpy as np
 import numba_utilities as cy_utilities
 import batch_norm_utils as batch_norm_utils
@@ -1458,14 +1473,14 @@ class Bernoulli_coupledLayer(Layer):
         if value == 'input':
             print('get moments from input not supported BernoulliCoupled')
             return
-        elif value == data:
+        elif value == 'data':
             mu = average(data, weights=weights)
             comu = average_product(data, data, weights=weights)
         return (mu, comu)
 
-    def internal_gradients(self, l2=0, l1=0, **kwargs):  # Bernoulli_coupled:
+    def internal_gradients(self, *args, l2=0, l1=0, **kwargs):  # Bernoulli_coupled:
         gradients = super(Bernoulli_coupledLayer,
-                          self).internal_gradients(**kwargs)
+                          self).internal_gradients(*args,**kwargs)
         if l2 > 0:
             gradients['couplings'] -= l2 * self.couplings
         if l1 > 0:
@@ -1554,13 +1569,13 @@ class Spin_coupledLayer(Layer):
         if value == 'input':
             print('get moments from input not supported BernoulliCoupled')
             return
-        elif value == data:
+        elif value == 'data':
             mu = average(data, weights=weights)
             comu = average_product(data, data, weights=weights)
         return (mu, comu)
 
-    def internal_gradients(self, l2=0, l1=0, **kwargs):  # Spin_coupled:
-        gradients = super(Spin_coupledLayer, self).internal_gradients(**kwargs)
+    def internal_gradients(self, *args, l2=0, l1=0, **kwargs):  # Spin_coupled:
+        gradients = super(Spin_coupledLayer, self).internal_gradients(*args,**kwargs)
         if l2 > 0:
             gradients['couplings'] -= l2 * self.couplings
         if l1 > 0:
@@ -1651,14 +1666,14 @@ class Potts_coupledLayer(Layer):
         if value == 'input':
             print('get moments from input not supported SpinCoupled')
             return
-        elif value == data:
+        elif value == 'data':
             mu = average(data, weights=weights, c=self.n_c)
             comu = average_product(data, data, weights=weights, c=self.n_c)
         return (mu, comu)
 
-    def internal_gradients(self, l2=0, l1=0, **kwargs):  # Potts_coupled:
+    def internal_gradients(self, *args,l2=0, l1=0, **kwargs):  # Potts_coupled:
         gradients = super(Potts_coupledLayer,
-                          self).internal_gradients(**kwargs)
+                          self).internal_gradients(*args,**kwargs)
         if l2 > 0:
             gradients['couplings'] -= l2 * self.couplings
         if l1 > 0:

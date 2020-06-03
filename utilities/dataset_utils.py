@@ -1,3 +1,20 @@
+"""
+ Copyright 2020 - by Jerome Tubiana (jertubiana@gmail.com)
+     All rights reserved
+
+     Permission is granted for anyone to copy, use, or modify this
+     software for any uncommercial purposes, provided this copyright
+     notice is retained, and note is made of any changes that have
+     been made. This software is distributed without any warranty,
+     express or implied. In no event shall the author or contributors be
+     liable for any damage arising out of the use of this software.
+
+     The publication of research using this software, modified or not, must include
+     appropriate citations to:
+"""
+
+
+
 import sys
 sys.path.append('../source/')
 import matplotlib
@@ -8,7 +25,7 @@ import pandas as pd
 import Proteins_utils
 import MNIST_utils
 import moi
-import utilities10 as utilities
+import utilities
 import importlib
 import pickle
 
@@ -137,7 +154,7 @@ def load_Oscillateur_zebrafish(local_env, path=''):
 
 
 
-def load_MNIST(local_env,path = '/home/tubiana/MNIST_folder/data/'):
+def load_MNIST(local_env,path = '../data/MNIST/'):
     train_data = path+u'train-images-idx3-ubyte'
     test_data = path+u't10k-images-idx3-ubyte'
     train_labels = path+u'train-labels-idx1-ubyte'
@@ -168,7 +185,7 @@ def load_MNIST(local_env,path = '/home/tubiana/MNIST_folder/data/'):
     local_env['test_weights'] = test_weights
 
 
-def load_Silhouettes(local_env,path=''):
+def load_Silhouettes(local_env,path='../data/Caltech_Silhouettes/'):
     tmp = loadmat(path+'caltech101_silhouettes_28_split1.mat')
     train_weights = None
     test_weights = None

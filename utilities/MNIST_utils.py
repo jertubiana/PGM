@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Oct 27 11:11:59 2016
-
-functions useful when training a Probabilistic Graphical model on MNIST
-Most are taken from from DeepLearning.net
-@author: jerometubiana
-"""
-
 
 try:
     import PIL.Image as Image
@@ -211,8 +202,8 @@ def tile_raster_images(X, img_shape, tile_shape, tile_spacing=(0, 0),
 
 
 #%% For MNIST
-        
-        
+
+
 def gen_monte_carlo_movie(PGM, Lchains = 100, Nchains = 10, Nthermalize = 0, N_PT = 10, Nstep = 1,PT_type = None ,p_init = 0.5, mean = False,exp= '0', folder = 'monte_carlo_videos', avconv = 'avconv'):
     size = int(np.sqrt(PGM.n_visibles))
     size2 = size**2
@@ -226,7 +217,7 @@ def gen_monte_carlo_movie(PGM, Lchains = 100, Nchains = 10, Nthermalize = 0, N_P
         else:
             for i in range(Nchains):
                 datav[i,:,:] = PGM.mean_visibles(datah[i,:,:])
-            
+
     for i in range(Lchains):
         if N_PT >1:
             image = Image.fromarray(
@@ -236,7 +227,7 @@ def gen_monte_carlo_movie(PGM, Lchains = 100, Nchains = 10, Nthermalize = 0, N_P
             tile_shape=(Nchains, N_PT),
             tile_spacing=(2, 2)
         )
-        ); 
+        );
         else:
             image = Image.fromarray(
             tile_raster_images(
@@ -246,15 +237,15 @@ def gen_monte_carlo_movie(PGM, Lchains = 100, Nchains = 10, Nthermalize = 0, N_P
             tile_spacing=(2, 2)
         )
         );
-        
-    
+
+
         image.save(folder+ '/' + exp+ 'tmp_%08d.png'%i)
     os.system(avconv + ' -y -i ' + folder + '/'+  exp + 'tmp_%08d.png ' + folder + '/' + 'monte_carlo_p%s_%s.mp4'%(p_init,exp))
     os.system('rm ' + folder + '/' + exp + '*tmp*')
-    
-def gen_FP_movie(PGM,fantasy_particles, exp = '0', folder = 'fantasy_particles_videos',avconv = 'avconv'):        
+
+def gen_FP_movie(PGM,fantasy_particles, exp = '0', folder = 'fantasy_particles_videos',avconv = 'avconv'):
     size = int(np.sqrt(PGM.n_visibles))
-    size2 = size**2        
+    size2 = size**2
     for i in range(len(fantasy_particles)):
         m = np.minimum(PGM.nchains,20)
         if PGM.N_PT >1:
@@ -265,7 +256,7 @@ def gen_FP_movie(PGM,fantasy_particles, exp = '0', folder = 'fantasy_particles_v
             tile_shape=(m, PGM.N_PT),
             tile_spacing=(2, 2)
         )
-        ); 
+        );
         else:
             image = Image.fromarray(
             tile_raster_images(
@@ -278,15 +269,15 @@ def gen_FP_movie(PGM,fantasy_particles, exp = '0', folder = 'fantasy_particles_v
         image.save(folder + '/' + exp + 'tmp_%08d.png'%i)
     os.system(avconv + ' -y -i ' + folder + '/'+  exp + 'tmp_%08d.png ' + folder + '/' + 'fantasy_particles_%s.mp4'%exp)
     os.system('rm ' + folder + '/' + exp + '*tmp*')
-    
-    
+
+
 def gen_W_movie(PGM,all_weights,exp='0',folder = 'weights_videos',avconv = 'avconv'):
     size = int(np.sqrt(PGM.n_visibles))
     a,b = np.percentile(PGM.weights.flatten(),[1,99.9]);
     for i in range(len(all_weights)):
         weights= (all_weights[i]- a)/(b-a) * 255
         weights = np.array(np.minimum(weights,255),dtype='uint8')
-    
+
         image = Image.fromarray(
         tile_raster_images(
             X= weights,
@@ -295,7 +286,7 @@ def gen_W_movie(PGM,all_weights,exp='0',folder = 'weights_videos',avconv = 'avco
             tile_spacing=(2, 2),scale_rows_to_unit_interval=False,output_pixel_vals = False
         )
         )
-        
+
         image.save(folder + '/' + exp + 'tmp_%08d.png'%i)
     os.system(avconv + ' -y -i ' + folder + '/'+  exp + 'tmp_%08d.png ' + folder + '/' + 'weigths_%s.mp4'%exp)
     os.system('rm ' + folder + '/' + exp + '*tmp*')
@@ -317,7 +308,7 @@ def show_weights(PGM,sort='false', show = True, n_h = None, columns = None, rows
     elif sort == 'c':
         a = np.argsort( PGM.c_plus + PGM.c_minus  )
         weights = PGM.weights[a[::-1],:][:n_h]
-        
+
     image = Image.fromarray(
     tile_raster_images(
         X= weights,
@@ -330,8 +321,8 @@ def show_weights(PGM,sort='false', show = True, n_h = None, columns = None, rows
         image.show()
     return image
 
-    
-    
+
+
 
 def show_FP(PGM, show = True):
     size = int(np.sqrt(PGM.n_visibles))
@@ -346,7 +337,7 @@ def show_FP(PGM, show = True):
             datav = PGM.fantasy_v[:,:,0]
         else:
             datav = PGM.fantasy_v[:,:]
-        
+
     image = Image.fromarray(
     tile_raster_images(
         X= datav,
@@ -358,7 +349,7 @@ def show_FP(PGM, show = True):
     if show:
         image.show()
     return image
-    
+
 
 def show_samples(data,size=None,tile_shape=None,show=True):
     data = np.asarray(data,dtype=float)
@@ -380,5 +371,5 @@ def show_samples(data,size=None,tile_shape=None,show=True):
         image.show()
     return image
 
-    
+
 #%%

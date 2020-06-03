@@ -1,9 +1,16 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
 """
-Created on Wed May 17 12:41:14 2017
+ Copyright 2020 - by Jerome Tubiana (jertubiana@gmail.com)
+     All rights reserved
 
-@author: jerometubiana
+     Permission is granted for anyone to copy, use, or modify this
+     software for any uncommercial purposes, provided this copyright
+     notice is retained, and note is made of any changes that have
+     been made. This software is distributed without any warranty,
+     express or implied. In no event shall the author or contributors be
+     liable for any damage arising out of the use of this software.
+
+     The publication of research using this software, modified or not, must include
+     appropriate citations to:
 """
 
 import numpy as np
@@ -232,12 +239,12 @@ class BM(pgm.PGM):
                                                                      np.newaxis, :, np.newaxis]) / self.n_c + (1 - p)**2 / self.n_c**2
             mean = p * mean + (1 - p) / self.n_c
 
-        iter_per_epoch = data.shape[0] / batch_size
+        iter_per_epoch = data.shape[0] // batch_size
         if init != 'previous':
             norm_init = 0
             self.init_couplings(norm_init)
             if init == 'independent':
-                self.layer.init_params_from_data(mean, eps=epsilon, mean=True)
+                self.layer.init_params_from_data(data, eps=epsilon, value='data')
 
         self.N_PT = N_PT
         self.N_MC = N_MC
@@ -369,7 +376,7 @@ class BM(pgm.PGM):
             X_neg = self.fantasy_x
 
         self.gradient['layer'] = self.layer.internal_gradients(
-            (mean, covariance), X_neg, l1=self.l1, l2=self.l2, value='mean')
+            (mean, covariance), X_neg, l1=self.l1, l2=self.l2, value='moments')
         if self.tmp_l2_fields > 0:
             self.gradient['layer']['fields'] -= self.tmp_l2_fields * \
                 self.layer.fields

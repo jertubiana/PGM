@@ -1,20 +1,18 @@
 
 # -*- coding: utf-8 -*-
 """
-Created on Thu Oct 27 11:22:02 2016
+ Copyright 2020 - by Jerome Tubiana (jertubiana@gmail.com)
+     All rights reserved
 
-Probabilistic Graphical Model (PGM) Class.
+     Permission is granted for anyone to copy, use, or modify this
+     software for any uncommercial purposes, provided this copyright
+     notice is retained, and note is made of any changes that have
+     been made. This software is distributed without any warranty,
+     express or implied. In no event shall the author or contributors be
+     liable for any damage arising out of the use of this software.
 
-A general class for any kind of PGM. Has a 'gen_data' method.
-
-
-TO DO
-
-Methods :
-- gen_data
-- markov_step
-
-@author: jerometubiana
+     The publication of research using this software, modified or not, must include
+     appropriate citations to:
 """
 
 

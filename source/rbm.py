@@ -1,8 +1,16 @@
 """
-Created on Thu Oct 27 11:46:59 2016
+ Copyright 2020 - by Jerome Tubiana (jertubiana@gmail.com)
+     All rights reserved
 
-RBM class.
-@author: jerometubiana
+     Permission is granted for anyone to copy, use, or modify this
+     software for any uncommercial purposes, provided this copyright
+     notice is retained, and note is made of any changes that have
+     been made. This software is distributed without any warranty,
+     express or implied. In no event shall the author or contributors be
+     liable for any damage arising out of the use of this software.
+
+     The publication of research using this software, modified or not, must include
+     appropriate citations to:
 """
 
 
@@ -22,7 +30,7 @@ from float_precision import double_precision, curr_float, curr_int
 
 
 class RBM(pgm.PGM):
-    def __init__(self, n_v=100, n_h=20, visible='Bernoulli', hidden='Bernoulli', interpolate=True, degree_interpolate=5, n_cv=1, n_ch=1, random_state=None, gauge='zerosum', zero_field=False):
+    def __init__(self, n_v=100, n_h=20, visible='Bernoulli', hidden='Bernoulli', interpolate=False, degree_interpolate=5, n_cv=1, n_ch=1, random_state=None, gauge='zerosum', zero_field=False):
         self.n_v = n_v
         self.n_h = n_h
         self.n_visibles = n_v
@@ -1206,7 +1214,6 @@ class RBM(pgm.PGM):
                     lr_multiplier = self.learning_rate_multiplier[key][key_]
                     has_momentum = self.has_momentum[key][key_]
                     gradient = item_
-                    saturate(gradient, 1.0)
                     if do_update:
                         if self.optimizer == 'SGD':
                             current += self.learning_rate * lr_multiplier * gradient
@@ -1243,7 +1250,6 @@ class RBM(pgm.PGM):
                 lr_multiplier = self.learning_rate_multiplier[key]
                 has_momentum = self.has_momentum[key]
                 gradient = item
-                saturate(gradient, 1.0)
                 if do_update:
                     if self.optimizer == 'SGD':
                         current += self.learning_rate * lr_multiplier * gradient

@@ -1,3 +1,18 @@
+"""
+ Copyright 2020 - by Jerome Tubiana (jertubiana@gmail.com)
+     All rights reserved
+
+     Permission is granted for anyone to copy, use, or modify this
+     software for any uncommercial purposes, provided this copyright
+     notice is retained, and note is made of any changes that have
+     been made. This software is distributed without any warranty,
+     express or implied. In no event shall the author or contributors be
+     liable for any damage arising out of the use of this software.
+
+     The publication of research using this software, modified or not, must include
+     appropriate citations to:
+"""
+
 import numpy as np
 from numba import njit, prange
 from numba.extending import get_cython_function_address
@@ -605,7 +620,7 @@ def sample_from_inputs_Spin_numba3(I, fields, out):
 @njit(parallel=True)
 def sample_from_inputs_Potts_numba2(I, fields, out):
     B, N, n_c = I.shape
-    rng = np.random.random_sample(size=(B, N))
+    rng = np.random.rand(B, N)
     cum_proba = np.empty(n_c, dtype=curr_float)
     for b in prange(B):
         for n in prange(N):
@@ -631,7 +646,7 @@ def sample_from_inputs_Potts_numba2(I, fields, out):
 @njit(parallel=True)
 def sample_from_inputs_Potts_numba3(I, fields, out):
     N_PT, B, N, n_c = I.shape
-    rng = np.random.random_sample(size=(N_PT, B, N))
+    rng = np.random.rand(N_PT, B, N)
     cum_proba = np.empty(n_c, dtype=curr_float)
     for n_pt in prange(N_PT):
         for b in prange(B):
@@ -659,7 +674,7 @@ def sample_from_inputs_Potts_numba3(I, fields, out):
 def sample_from_inputs_dReLU_numba2(I, gamma_plus, gamma_minus, theta_plus,
                                     theta_minus, out):
     B, N = I.shape
-    rng = np.random.random_sample(size=(2 * B, N))
+    rng = np.random.rand(2 * B, N)
     for b in prange(B):
         for n in prange(N):
             I_plus = (-I[b, n] + theta_plus[n]) / np.sqrt(gamma_plus[n])
@@ -699,7 +714,7 @@ def sample_from_inputs_dReLU_numba2(I, gamma_plus, gamma_minus, theta_plus,
 def sample_from_inputs_dReLU_numba3(I, gamma_plus, gamma_minus, theta_plus,
                                     theta_minus, out):
     N_PT, B, N = I.shape
-    rng = np.random.random_sample(size=(2 * N_PT, B, N))
+    rng = np.random.rand(2 * N_PT, B, N)
     for n_pt in prange(N_PT):
         for b in prange(B):
             for n in prange(N):
@@ -789,7 +804,7 @@ def cgf_from_inputs_dReLU_numba3(I, gamma_plus, gamma_minus, theta_plus,
 @njit(parallel=True)
 def Bernoulli_Gibbs_free_C(x, fields_eff, B, N, fields0, couplings, beta):
     rng1 = np.random.randint(0, high=N, size=(B, N))
-    rng2 = np.random.random_sample(size=(B, N))
+    rng2 = np.random.rand(B, N)
 
     for b in prange(B):
         for n in range(N):
@@ -810,7 +825,7 @@ def Bernoulli_Gibbs_free_C(x, fields_eff, B, N, fields0, couplings, beta):
 @njit(parallel=True)
 def Bernoulli_Gibbs_input_C(x, fields_eff, I, B, N, fields0, couplings, beta):
     rng1 = np.random.randint(0, high=N, size=(B, N))
-    rng2 = np.random.random_sample(size=(B, N))
+    rng2 = np.random.rand(B, N)
     for b in prange(B):
         for n in range(N):
             pos = rng1[b, n]
@@ -831,7 +846,7 @@ def Bernoulli_Gibbs_input_C(x, fields_eff, I, B, N, fields0, couplings, beta):
 @njit(parallel=True)
 def Spin_Gibbs_free_C(x, fields_eff, B, N, fields0, couplings, beta):
     rng1 = np.random.randint(0, high=N, size=(B, N))
-    rng2 = np.random.random_sample(size=(B, N))
+    rng2 = np.random.rand(B, N)
     for b in prange(B):
         for n in range(N):
             pos = rng1[b, n]
@@ -853,7 +868,7 @@ def Spin_Gibbs_free_C(x, fields_eff, B, N, fields0, couplings, beta):
 @njit(parallel=True)
 def Spin_Gibbs_input_C(x, fields_eff, I, B, N, fields0, couplings, beta):
     rng1 = np.random.randint(0, high=N, size=(B, N))
-    rng2 = np.random.random_sample(size=(B, N))
+    rng2 = np.random.rand(B, N)
     for b in prange(B):
         for n in range(N):
             pos = rng1[b, n]
@@ -875,7 +890,7 @@ def Spin_Gibbs_input_C(x, fields_eff, I, B, N, fields0, couplings, beta):
 @njit(parallel=True)
 def Potts_Gibbs_free_C(x, fields_eff, B, N, n_c, fields0, couplings, beta):
     rng1 = np.random.randint(0, high=N, size=(B, N))
-    rng2 = np.random.random_sample(size=(B, N))
+    rng2 = np.random.rand(B, N)
     for b in prange(B):
         for n in range(N):
             pos = rng1[b, n]
@@ -904,7 +919,7 @@ def Potts_Gibbs_free_C(x, fields_eff, B, N, n_c, fields0, couplings, beta):
 @njit(parallel=True)
 def Potts_Gibbs_input_C(x, fields_eff, I, B, N, n_c, fields0, couplings, beta):
     rng1 = np.random.randint(0, high=N, size=(B, N))
-    rng2 = np.random.random_sample(size=(B, N))
+    rng2 = np.random.rand(B, N)
     for b in prange(B):
         for n in range(N):
             pos = rng1[b, n]

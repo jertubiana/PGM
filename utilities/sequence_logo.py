@@ -1,15 +1,15 @@
 """
- Copyright 2018 - by Jerome Tubiana (jertubiana@gmail.com)
+ Copyright 2020 - by Jerome Tubiana (jertubiana@gmail.com)
      All rights reserved
-     
+
      Permission is granted for anyone to copy, use, or modify this
-     software for any uncommercial purposes, provided this copyright 
-     notice is retained, and note is made of any changes that have 
-     been made. This software is distributed without any warranty, 
-     express or implied. In no event shall the author or contributors be 
+     software for any uncommercial purposes, provided this copyright
+     notice is retained, and note is made of any changes that have
+     been made. This software is distributed without any warranty,
+     express or implied. In no event shall the author or contributors be
      liable for any damage arising out of the use of this software.
-     
-     The publication of research using this software, modified or not, must include 
+
+     The publication of research using this software, modified or not, must include
      appropriate citations to:
 """
 
@@ -146,14 +146,14 @@ def build_scores_break(matrix, selected,epsilon=1e-4):
     has_breaks = np.concatenate((np.zeros(1),has_breaks) ,axis=0)
     n_sites = len(selected)
     n_colors = matrix.shape[1]
-    
+
     epsilon = 1e-4
     all_scores = []
     maxi_size = 0
     for site,has_break in zip(selected,has_breaks):
         if has_break:
-            all_scores.append([('BREAK','BREAK','BREAK')] )      
-#             all_scores.append([('BREAK','BREAK','BREAK')] )            
+            all_scores.append([('BREAK','BREAK','BREAK')] )
+#             all_scores.append([('BREAK','BREAK','BREAK')] )
         conservation = np.log2(21) + (np.log2(matrix[site]+epsilon) * matrix[site]).sum()
         liste = []
         order_colors = np.argsort(matrix[site])
@@ -169,12 +169,12 @@ def build_scores2_break(matrix, selected):
     has_breaks = np.concatenate((np.zeros(1),has_breaks) ,axis=0)
     n_sites = len(selected)
     n_colors = matrix.shape[1]
-    
+
     epsilon = 1e-4
     all_scores = []
     for site,has_break in zip(selected,has_breaks):
         if has_break:
-            all_scores.append([('BREAK','BREAK','BREAK')] )      
+            all_scores.append([('BREAK','BREAK','BREAK')] )
         liste = []
         c_pos = np.nonzero(matrix[site] >= 0)[0]
         c_neg = np.nonzero(matrix[site] < 0)[0]
@@ -213,7 +213,7 @@ def Sequence_logo(matrix, ax = None,data_type=None,figsize=None,ylabel = None,ti
             figsize = (  max(int(0.3 * matrix.shape[0])/nrows, 2)  ,  3*nrows)
         fig, ax = plt.subplots(nrows,1,figsize=figsize)
         return_fig = True
-    
+
     if nrows>1:
         siz = int( np.ceil(matrix.shape[0]/nrows) )
         minis = []
@@ -239,15 +239,15 @@ def Sequence_logo(matrix, ax = None,data_type=None,figsize=None,ylabel = None,ti
 
         for row in range(nrows):
             ax[row].set_ylim([min(minis),max(maxis)])
-            
-    else:      
+
+    else:
         if data_type == 'mean':
             all_scores = build_scores(matrix,epsilon=epsilon)
         elif data_type =='weights':
             all_scores = build_scores2(matrix)
         else:
             print('data type not understood')
-            return -1            
+            return -1
 
         x = 1
         maxi = 0
@@ -305,11 +305,11 @@ def Sequence_logo(matrix, ax = None,data_type=None,figsize=None,ylabel = None,ti
         ax.tick_params(axis='both', which='minor', labelsize=ticks_labels_size)
         if title is not None:
             ax.set_title(title,fontsize=title_size)
-        if return_fig:
-            plt.tight_layout()
-            if show:
-                plt.show()
-            return fig
+    if return_fig:
+        plt.tight_layout()
+        if show:
+            plt.show()
+        return fig
 
 def Sequence_logo_breaks(matrix, data_type=None,selected = None, window=5,theta_important=0.25,figsize=None,nrows=1,ylabel = None,title=None,epsilon=1e-4,show=True,ticks_every=5,ticks_labels_size=14,title_size=20):
     if data_type is None:
@@ -317,7 +317,7 @@ def Sequence_logo_breaks(matrix, data_type=None,selected = None, window=5,theta_
             data_type='mean'
         else:
             data_type = 'weights'
-    
+
     if selected is None:
         if data_type == 'mean':
             'NO SELECTION SUPPORTED FOR MEAN VECTOR'
@@ -327,9 +327,9 @@ def Sequence_logo_breaks(matrix, data_type=None,selected = None, window=5,theta_
     else:
         selected = np.array(selected)
     print('Number of sites selected: %s'%len(selected))
-            
+
     xticks,xticks_labels = ticksAt(selected,ticks_every=ticks_every)
-            
+
     if data_type == 'mean':
         all_scores,maxi_size = build_scores_break(matrix,selected,epsilon=epsilon)
     elif data_type =='weights':
@@ -341,7 +341,7 @@ def Sequence_logo_breaks(matrix, data_type=None,selected = None, window=5,theta_
 
     nbreaks = ( (selected[1:] - selected[:-1])>1 ).sum()
     width = (len(selected) + nbreaks)/nrows
-    
+
     if figsize is None:
         figsize = (  max(int(0.3 * width), 2)  ,  3 * nrows)
 
@@ -356,7 +356,7 @@ def Sequence_logo_breaks(matrix, data_type=None,selected = None, window=5,theta_
     x = 1
     maxi = 0
     mini = 0
-    
+
     if nrows>1:
         row = 0
         ax_ = ax[row]
@@ -364,9 +364,9 @@ def Sequence_logo_breaks(matrix, data_type=None,selected = None, window=5,theta_
         xmaxs = np.ones(nrows) * (len(selected) + nbreaks+1)
     else:
         ax_ = ax
-        
-    
-    
+
+
+
     for scores in all_scores:
         if data_type == 'mean':
             y = 0
@@ -378,7 +378,7 @@ def Sequence_logo_breaks(matrix, data_type=None,selected = None, window=5,theta_
                         xmins[row+1] = copy.copy(x)
                         row+=1
                         ax_ = ax[row]
-            else:            
+            else:
                 for base, score in scores:
                     if score > 0.01:
                         letterAt(base, x,y, score, ax_)
@@ -398,7 +398,7 @@ def Sequence_logo_breaks(matrix, data_type=None,selected = None, window=5,theta_
                         xmins[row+1] = copy.copy(x)
                         row+=1
                         ax_ = ax[row]
-                        
+
             else:
                 for base,score,sign in scores:
                     if sign == '+':
@@ -414,7 +414,7 @@ def Sequence_logo_breaks(matrix, data_type=None,selected = None, window=5,theta_
     if data_type == 'weights':
         maxi = max(  maxi, abs(mini) )
         mini = -maxi
-        
+
 
     if nrows>1:
         for row in range(nrows):
@@ -424,11 +424,11 @@ def Sequence_logo_breaks(matrix, data_type=None,selected = None, window=5,theta_
             ax[row].set_xticks(xticks[subset])
             ax[row].set_xticklabels(xticks_labels[subset])
     else:
-        plt.xticks(xticks,xticks_labels)    
+        plt.xticks(xticks,xticks_labels)
         plt.xlim((0, x))
         plt.ylim((mini, maxi))
-        
-        
+
+
     if ylabel is None:
         if data_type == 'mean':
             ylabel = 'Conservation (bits)'
@@ -439,8 +439,8 @@ def Sequence_logo_breaks(matrix, data_type=None,selected = None, window=5,theta_
         for row in range(1,nrows):
             ax[row].set_ylabel('. . .',fontsize=title_size)
     else:
-        ax.set_ylabel(ylabel,fontsize=title_size)        
-    
+        ax.set_ylabel(ylabel,fontsize=title_size)
+
     if nrows>1:
         for k in range(nrows):
             ax[k].spines['right'].set_visible(False)
@@ -449,8 +449,8 @@ def Sequence_logo_breaks(matrix, data_type=None,selected = None, window=5,theta_
             ax[k].xaxis.set_ticks_position('bottom')
             ax[k].tick_params(axis='both', which='major', labelsize=ticks_labels_size)
             ax[k].tick_params(axis='both', which='minor', labelsize=ticks_labels_size)
-                
-    else:    
+
+    else:
         ax.spines['right'].set_visible(False)
         ax.spines['top'].set_visible(False)
         ax.yaxis.set_ticks_position('left')
@@ -458,11 +458,11 @@ def Sequence_logo_breaks(matrix, data_type=None,selected = None, window=5,theta_
         ax.tick_params(axis='both', which='major', labelsize=ticks_labels_size)
         ax.tick_params(axis='both', which='minor', labelsize=ticks_labels_size)
 
-        
-            
+
+
     if title is not None:
         if nrows>1:
-            ax[0].set_title(title,fontsize=title_size)            
+            ax[0].set_title(title,fontsize=title_size)
         else:
             ax.set_title(title,fontsize=title_size)
     plt.tight_layout()
@@ -509,7 +509,7 @@ def Sequence_logo_multiple(matrix, data_type=None,figsize=None,ylabel = None,tit
             ax_ = [get_ax(ax, i*rows_per_weight+l , nrows*rows_per_weight,ncols) for l in range(rows_per_weight)]
         else:
             ax_ = get_ax(ax,i,nrows,ncols)
-            
+
         Sequence_logo(matrix[i], ax = ax_, data_type= data_type, ylabel = ylabels[i], title = titles[i],
             epsilon = epsilon, show=False, ticks_every=ticks_every, ticks_labels_size = ticks_labels_size, title_size=title_size,
                      nrows = rows_per_weight)
@@ -519,7 +519,7 @@ def Sequence_logo_multiple(matrix, data_type=None,figsize=None,ylabel = None,tit
         plt.show()
     return fig
 
-    
+
 def Sequence_logo_all(matrix, name='all_Sequence_logo.pdf', nrows = 5, ncols = 2,data_type=None,figsize=None,ylabel = None,title=None,epsilon=1e-4,ticks_every=5,ticks_labels_size=14,title_size=20,dpi=100):
     if data_type is None:
         if matrix.min()>=0:

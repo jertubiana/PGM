@@ -1,3 +1,17 @@
+"""
+ Copyright 2020 - by Jerome Tubiana (jertubiana@gmail.com)
+     All rights reserved
+
+     Permission is granted for anyone to copy, use, or modify this
+     software for any uncommercial purposes, provided this copyright
+     notice is retained, and note is made of any changes that have
+     been made. This software is distributed without any warranty,
+     express or implied. In no event shall the author or contributors be
+     liable for any damage arising out of the use of this software.
+
+     The publication of research using this software, modified or not, must include
+     appropriate citations to:
+"""
 # %% Useful functions
 import numpy as np
 import numbers
@@ -177,6 +191,10 @@ def bound(x, xmin=None, xmax=None):
 
 
 def average(X, c=1, weights=None):
+    if weights is not None:
+        if weights.dtype != curr_float:
+            weights = weights.astype(curr_float)
+
     if (c == 1):
         if weights is None:
             return X.sum(0).astype(curr_float) / X.shape[0]
@@ -195,6 +213,10 @@ def average(X, c=1, weights=None):
 
 
 def average_product(X1, X2, c1=1, c2=1, mean1=False, mean2=False, weights=None):
+    if weights is not None:
+        if weights.dtype != curr_float:
+            weights = weights.astype(curr_float)
+
     if (c1 == 1) & (c2 == 1):
         if weights is None:
             return np.dot(X1.T, np.asarray(X2, dtype=curr_float)) / X1.shape[0]
