@@ -1,5 +1,5 @@
 """
- Copyright 2020 - by Jerome Tubiana (jertubiana@gmail.com)
+ Copyright 2018 - by Jerome Tubiana (jertubiana@@gmail.com)
      All rights reserved
 
      Permission is granted for anyone to copy, use, or modify this
@@ -138,7 +138,7 @@ def get_hidden_unit_importance(RBM,data,weights=None,Nchains=200,Nthermalize=100
     Estimate the hidden unit importance as the difference between the data likelihood of the full RBM and the data likelihood of the where hidden unit has been removed.
     Estimated by importance sampling (see K. Shimagaki, M. Weigt 2019 for a derivation for Gaussian variables).
     Delta L takes into account both the norm of the weights and the shape of the non-linearity.
-    Compared to the weight norm, it tends to put lower importance to the “phylogenetic” features, activated by very few sequences.
+    Compared to the weight norm, it tends to put lower importance to the “phylogenetic” features, activated by very few sequences.    
     '''
     if (not recompute) & hasattr(RBM,'hidden_unit_importance'):
         return RBM.hidden_unit_importance
@@ -266,8 +266,8 @@ def get_effective_couplings_exact(RBM,data,weights=None,nbins=10,subset = None):
     M = RBM.n_h
     c = RBM.n_cv
     J = np.zeros([N,N,c,c])
-    # if pool is None:
-    #     pool = Pool()
+    if pool is None:
+        pool = Pool()
 
     inputs = []
     if subset is not None:
@@ -287,7 +287,7 @@ def get_effective_couplings_exact(RBM,data,weights=None,nbins=10,subset = None):
         J[i,j] = res[x]
         if j !=i:
             J[j,i] = res[x].T
-    # pool.close()
+    pool.close()
     return J
 
 
