@@ -125,14 +125,10 @@ predicted analytically
   - Inference of couplings by pseudo-likelihood maximization.
   - Comparison at various sample sizes.
 
-- **Hindbrain oscillator zebrafish**
 
 ## References:
 
 Articles using this package or a previous version.
-
-<!-- - A venir: Thijs, Sebastien. -->
-<!-- - [8] Science (only entropy estimation) -->
 
 1. Tubiana, J., & Monasson, R. (2017). Emergence of compositional representations in restricted Boltzmann machines. Physical review letters, 118(13), 138301.  
 2. Cocco, S., Monasson, R., Posani, L., Rosay, S., & Tubiana, J. (2018). Statistical physics and representations in real and artificial neural networks. Physica A: Statistical Mechanics and its Applications, 504, 45-76.   
