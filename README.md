@@ -67,7 +67,7 @@ For usage, please refer to the Jupyter notebooks in the examples/ folder for usa
 
 - **Lattice Proteins** (LP) are artificial protein sequences, used here to benchmark the algorithm against ground truth knowledge of the structure and of the fitness function (See refs [3,4]).
   - Training RBM
-  - Hidden unit selection.
+  - Hidden unit selection based on hidden unit properties (sparsity, importance, non-linearity...).
   - Hidden unit visualization (weight logo, input distribution)
   - Artificial sequences generation
   - Conditional and low-temperature sampling
@@ -76,7 +76,7 @@ For usage, please refer to the Jupyter notebooks in the examples/ folder for usa
 - **WW Domain**. The WW domain is a short ($N=31$) binding domain targeting proline-rich motifs. WW domains are usually classified into 4 types, according to their binding specificity toward different motifs (e.g. PPXY, PPLP p[T/S]P...). We show here some features found by the algorithm and their connection with binding specificity. This notebook reproduces the panels of Figure 3, Ref [3].
 
   - Training RBM
-  - Hidden unit selection based on available partial labels.
+  - Hidden unit selection based on hidden unit properties and available sequence labels.
   - Hidden unit visualization.
   - Mapping hidden units onto PDB files.
   - Artificial sequences generation.
@@ -116,7 +116,7 @@ Hsp70 genes differ by organism, location of expression (Nucleus/Cytoplasm, Mitoc
   - Monte Carlo trajectory.
 predicted analytically
 
-- **Equivalence between Boltzmann Machines and Gaussian RBM.** Code for mapping
+- **Equivalence between Boltzmann Machines and Gaussian RBM.** RBM with Gaussian hidden units are equivalent to BM with low-rank interaction matrices. Here, evaluated numerically.
   - Code for mapping a Gaussian RBM onto a BM.
   - Sample generation and moments comparison.
 
