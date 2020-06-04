@@ -89,7 +89,7 @@ def plot_input_mean(RBM,I, subset, I_range=None,mean=None,weights = None, ax = N
     for i in range(nfeatures):
         ax_ = get_ax(ax,i,nrows,ncols)
         ax2_ = ax_.twinx()
-        ax2_.hist(I[:,subset[i]],normed=True,weights=weights,bins=100)
+        ax2_.hist(I[:,subset[i]],density=True,weights=weights,bins=100)
         ax_.plot(I_range,mean[:,subset[i]],c='black',linewidth=2)
 
         xmin = I[:,subset[i]].min()
@@ -167,11 +167,11 @@ def plot_input_classes(subset,I_background, I_test, class_names=None, background
         col = i%ncols
 
         all_hists = []
-        ax_.hist(I_background[:,subset[i]],color='black',bins=100,normed=True, histtype='bar',alpha=0.25,label=background_name)
+        ax_.hist(I_background[:,subset[i]],color='black',bins=100,density=True, histtype='bar',alpha=0.25,label=background_name)
         F = patches.Rectangle((0,0),1,1,facecolor='black',alpha=0.25)
         all_hists.append(F)
         for k in range(n_class):
-            ax2_.hist(I_test[k][:,subset[i]],color=colors[k],normed=True, histtype='step',label=class_names[k],bins=nbins[k])
+            ax2_.hist(I_test[k][:,subset[i]],color=colors[k],density=True, histtype='step',label=class_names[k],bins=nbins[k])
             F = patches.Rectangle((0,0),1,1,facecolor=colors[k])
             all_hists.append(F)
         ax_.set_xlabel(xlabels[i],fontsize=14)
@@ -317,8 +317,8 @@ def plot_top_activating_distance(RBM, I,data, subset, nseqs = 20,all_distances =
 
     for i in range(nfeatures):
         ax_ = get_ax(ax,i,nrows,ncols)
-        ax_.hist(all_distances,bins=RBM.n_v,normed=True,range=(0,1),color = 'gray',alpha = 0.5)
-        ax_.hist(distance_top_features[subset[i]],bins=RBM.n_v,normed=True,range=(0,1),alpha=0.5)
+        ax_.hist(all_distances,bins=RBM.n_v,density=True,range=(0,1),color = 'gray',alpha = 0.5)
+        ax_.hist(distance_top_features[subset[i]],bins=RBM.n_v,density=True,range=(0,1),alpha=0.5)
         ax_.set_xticks([0,0.5,1])
         ax_.set_xticklabels([0,0.5,1],fontsize=12)
         ax_.set_yticks([])
@@ -409,7 +409,7 @@ def make_all_weights(RBM,data, pdb_file = None, pdb_chain=None, subset=None,name
 
     if dpi is None:
         if pdb_file is not None:
-            dpi = 200
+            dpi = 100
         else:
             dpi = 50
 
@@ -445,7 +445,7 @@ def make_all_weights(RBM,data, pdb_file = None, pdb_chain=None, subset=None,name
 
     if gap_at_bottom:
         gap_fraction = RBM_utils.get_norm_gaps(RBM.weights,a=1)/RBM_utils.get_norm(RBM.weights,a=1)
-        order = np.argsort(sorting_value  + 1000. * (gap_fraction < 0.3) )[::-1]
+        order = np.argsort(sorting_value  + 1000. * (gap_fraction < 0.2) )[::-1]
     else:
         order = np.argsort(sorting_value)[::-1]
 
@@ -525,7 +525,7 @@ def make_all_weights(RBM,data, pdb_file = None, pdb_chain=None, subset=None,name
 
         elif (rows_per_weight>1) & (pdb_file is None):
             fig = plt.figure(figsize = (figsize[0]+figsize[1],figsize[1]*weights_per_page))
-            gs = gridspec.GridSpec(2*weights_per_page, 2,width_ratios = [figsize[0],figsize[1]])
+            gs = gridspec.GridSpec(2*weights_per_page*rows_per_weight, 2,width_ratios = [figsize[0],figsize[1]])
         else:
             fig = plt.figure(figsize = (figsize[0]+figsize[1],figsize[1]*weights_per_page))
             gs = gridspec.GridSpec(2*weights_per_page*rows_per_weight, 2,width_ratios = [figsize[0],figsize[1]])

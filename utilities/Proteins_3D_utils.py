@@ -336,7 +336,7 @@ def visualize_sectors(sectors,pdb,output_folder,
             sector_color = sector_colors[0]
         if with_numbers:
             l_original_previous = -100
-        for l_original,l in zip(sector_pdb,sector_pdb_mapped):
+        for l_original,l in zip(sector_mapped,sector_pdb_mapped):
             commands_chimera.append(
             'color %s #0.%s:%s.%s'% ( sector_color, model, index_pdb[l][1],index_pdb[l][0]) )
             if show_sidechains:
