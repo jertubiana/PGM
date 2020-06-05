@@ -195,6 +195,10 @@ def average(X, c=1, weights=None):
         if weights.dtype != curr_float:
             weights = weights.astype(curr_float)
 
+    if c>1:
+        if X.dtype != curr_int:
+            X = X.astype(curr_int)
+
     if (c == 1):
         if weights is None:
             return X.sum(0).astype(curr_float) / X.shape[0]
@@ -216,6 +220,14 @@ def average_product(X1, X2, c1=1, c2=1, mean1=False, mean2=False, weights=None):
     if weights is not None:
         if weights.dtype != curr_float:
             weights = weights.astype(curr_float)
+
+    if (c1>1) and not mean1:
+        if X1.dtype != curr_int:
+            X1 = X1.astype(curr_int)
+    if (c2>1) and not mean2:
+        if X2.dtype != curr_int:
+            X2 = X2.astype(curr_int)
+
 
     if (c1 == 1) & (c2 == 1):
         if weights is None:
@@ -281,6 +293,19 @@ def average_product(X1, X2, c1=1, c2=1, mean1=False, mean2=False, weights=None):
 
 
 def covariance(X1, X2, c1=1, c2=1, mean1=False, mean2=False, weights=None):
+    if weights is not None:
+        if weights.dtype != curr_float:
+            weights = weights.astype(curr_float)
+
+    if (c1>1) and not mean1:
+        if X1.dtype != curr_int:
+            X1 = X1.astype(curr_int)
+    if (c2>1) and not mean2:
+        if X2.dtype != curr_int:
+            X2 = X2.astype(curr_int)
+
+
+
     if mean1:
         mu1 = average(X1, weights=weights)
     else:
