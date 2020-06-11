@@ -32,6 +32,7 @@ class BM(pgm.PGM):
         else:
             self.n_c = 1
         self.zero_field = zero_field
+        self.interpolate = False
 
         super(BM, self).__init__(n_layers=1, layers_size=[self.N], layers_nature=[
             self.nature + '_coupled'], layers_n_c=[self.n_c], layers_name=['layer'])

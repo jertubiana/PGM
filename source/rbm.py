@@ -1026,7 +1026,7 @@ class RBM(pgm.PGM):
     def minibatch_fit(self, V_pos, weights=None, verbose=True):
         self.count_updates += 1
         if self.CD:  # Contrastive divergence: initialize the Markov chain at the data point.
-            self.fantasy_v = V_pos
+            self.fantasy_v[:V_pos.shape[0]] = V_pos # Copy the value, not the pointer. DO NOT USE self.fantasy_v = V_pos
         # Else: use previous value.
         for _ in range(self.N_MC):
             if self.N_PT > 1:

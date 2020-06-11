@@ -315,10 +315,15 @@ class Layer():
                 if I0 is not None:
                     f += (1 - beta) * I0
             if self.nature == 'Potts_coupled':
-                I, Idim = reshape_in(I, xdim=2)
-                energy = - \
-                    reshape_out(cy_utilities.dot_Potts2_C(
-                        reshape_in(x, xdim=1)[0], f), Idim, xdim=2)
+                xflat,xdim  = reshape_in(x,xdim=1)
+                fflat = reshape_in(f,xdim=2)[0]
+                energy = - reshape_out(
+                    cy_utilities.dot_Potts2_C(xflat,fflat), xdim, xdim=1)
+
+                # I, Idim = reshape_in(I, xdim=2)
+                # energy = - \
+                #     reshape_out(cy_utilities.dot_Potts2_C(
+                #         reshape_in(x, xdim=1)[0], f), Idim, xdim=2)
             else:
                 energy = -np.sum(x * f, -1)
             return (x, fields_eff), energy
@@ -1487,6 +1492,12 @@ class Bernoulli_coupledLayer(Layer):
             gradients['couplings'] -= l1 * np.sign(self.couplings)
         return gradients
 
+    def cgf_from_inputs(self, I, I0=None, beta=1):
+        assert beta == 0,'CGF from inputs not supported for Bernoulli coupled, beta != 0'
+        I = self.get_input(I, I0=I0, beta=beta)
+        self.get_params(beta=beta)
+        return np.logaddexp(0, self._fields + I)
+
 
 class Spin_coupledLayer(Layer):
     def __init__(self, N=100, position='visible', batch_norm=False, zero_field=False, random_state=None, **kwargs):
@@ -1582,6 +1593,12 @@ class Spin_coupledLayer(Layer):
             gradients['couplings'] -= l1 * np.sign(self.couplings)
         return gradients
 
+    def cgf_from_inputs(self, I, I0=None, beta=1):
+        assert beta == 0,'CGF from inputs not supported for Spin coupled, beta != 0'        
+        I = self.get_input(I, I0=I0, beta=beta)
+        self.get_params(beta=beta)
+        tmp = self._fields + I
+        return np.logaddexp(-tmp, tmp)        
 
 class Potts_coupledLayer(Layer):
     def __init__(self, N=100, position='visible', batch_norm=False, zero_field=False, gauge='zerosum', n_c=2, random_state=None, **kwargs):
@@ -1679,6 +1696,13 @@ class Potts_coupledLayer(Layer):
         if l1 > 0:
             gradients['couplings'] -= l1 * np.sign(self.couplings)
         return gradients
+
+
+    def cgf_from_inputs(self, I, I0=None, beta=1):
+        assert beta == 0,'CGF from inputs not supported for Bernoulli coupled, beta != 0'        
+        I = self.get_input(I, I0=I0, beta=beta)
+        self.get_params(beta=beta)
+        return logsumexp(self._fields + I, -1)
 
 
 class InterpolateLayer(Layer):
