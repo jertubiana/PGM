@@ -37,19 +37,19 @@ plots_utils.make_all_weights(RBM,sequences,name = 'all_weights_WW.pdf',pdb_file=
 - A Python3 distribution (e.g. Anaconda, https://www.anaconda.com/products/individual tested for >=3.6.8) with latest versions of numpy (>= 1.18.4) and numba (>=0.44.1). Please upgrade your packages via:
 ```
 pip install --upgrade numpy
-```
-```
+pip install --ignore-installed llvmlite
 pip install --upgrade numba
 ```
+
 
 - Optional dependencies, only for mapping RBM weights onto PDB structures with plots_utils.make_all_weights:
     - Biopython (For parsing PDB files)
 ```
 pip install biopython
 ```
-    - Chimera (https://www.cgl.ucsf.edu/chimera/ for visualizing PDB structures)
+- Chimera (https://www.cgl.ucsf.edu/chimera/ for visualizing PDB structures)
 
-    - HMMer (http://hmmer.org/ , for aligning the PDB structure with the MSA)
+- HMMer (http://hmmer.org/ , for aligning the PDB structure with the MSA)
 
 ## Installation
 - No installation is required for basic usage; please refer to the notebooks in the examples/ folder.
