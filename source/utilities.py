@@ -201,7 +201,7 @@ def average(X, c=1, weights=None):
 
     if (c == 1):
         if weights is None:
-            return X.sum(0).astype(curr_float) / X.shape[0]
+            return X.sum(0).astype(curr_float) / curr_float(X.shape[0])
         else:
             if X.ndim == 1:
                 return (X * weights).sum(0) / weights.sum()

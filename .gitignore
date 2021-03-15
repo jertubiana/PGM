@@ -1,0 +1,6 @@
+
+*.pyc
+*.nbc
+*.nbi
+.DS_Store
+examples/.ipynb_checkpoints/Lattice Proteins-checkpoint.ipynb
