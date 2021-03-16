@@ -1066,7 +1066,10 @@ class RBM(pgm.PGM):
                     return False
 
         if self.N_MC > 0:  # Regular Monte Carlo
-            weights_neg = None
+            if self.CD:
+                weights_neg = weights
+            else:
+                weights_neg = None
         # No Monte Carlo. Compute exhaustively the moments using all 2**N configurations.
         else:
             if self.from_hidden:
