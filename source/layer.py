@@ -379,8 +379,7 @@ class BernoulliLayer(Layer):
         self.list_params = ['fields']
         self.params_anneal = {'fields': True}
         self.params_newaxis = {'fields': True}
-        self.do_grad_updates = {'fields': ~
-                                self.zero_field, 'fields0': (~self.zero_field)}
+        self.do_grad_updates = {'fields': (not self.zero_field), 'fields0': (not self.zero_field)}
         self.do_grad_updates_batch_norm = self.do_grad_updates
         self.factors = [1]
 
@@ -431,6 +430,8 @@ class BernoulliLayer(Layer):
         return (mu,)
 
     def init_params_from_data(self, X, eps=1e-6, value='data', weights=None):
+        if self.zero_field:
+            return
         if X is None:
             self.fields = np.zeros(self.N, dtype=curr_float)
             self.fields0 = np.zeros(self.N, dtype=curr_float)
@@ -443,11 +444,16 @@ class BernoulliLayer(Layer):
             self.fields0 = self.fields.copy()
 
     def batch_norm_update(self, mu_I, I, **kwargs):
+        if self.zero_field:
+            return
         delta_mu_I = (mu_I - self.mu_I)
         self.mu_I = mu_I
         self.fields -= delta_mu_I
+        return
 
     def batch_norm_update_gradient(self, gradient_W, gradient_hlayer, V, I, mu, n_c, weights=None):
+        if self.zero_field:
+            return
         add_to_gradient(gradient_W, gradient_hlayer['fields'], -mu)
         return
 
@@ -462,8 +468,7 @@ class SpinLayer(Layer):
         self.list_params = ['fields']
         self.params_anneal = {'fields': True}
         self.params_newaxis = {'fields': True}
-        self.do_grad_updates = {'fields': ~
-                                self.zero_field, 'fields0': (~self.zero_field)}
+        self.do_grad_updates = {'fields': (not self.zero_field), 'fields0': (not self.zero_field)}
         self.do_grad_updates_batch_norm = self.do_grad_updates
         self.factors = [1]
 
@@ -514,6 +519,8 @@ class SpinLayer(Layer):
         return (mu,)
 
     def init_params_from_data(self, X, eps=1e-6, value='data', weights=None):
+        if self.zero_field:
+            return
         if X is None:
             self.fields = np.zeros(self.N, dtype=curr_float)
             self.fields0 = np.zeros(self.N, dtype=curr_float)
@@ -527,11 +534,15 @@ class SpinLayer(Layer):
             self.fields0 = self.fields.copy()
 
     def batch_norm_update(self, mu_I, I, **kwargs):
+        if self.zero_field:
+            return
         delta_mu_I = (mu_I - self.mu_I)
         self.mu_I = mu_I
         self.fields -= delta_mu_I
 
     def batch_norm_update_gradient(self, gradient_W, gradient_hlayer, V, I, mu, n_c, weights=None):
+        if self.zero_field:
+            return
         add_to_gradient(gradient_W, gradient_hlayer['fields'], -mu)
         return
 
@@ -547,8 +558,7 @@ class PottsLayer(Layer):
         self.list_params = ['fields']
         self.params_anneal = {'fields': True}
         self.params_newaxis = {'fields': True}
-        self.do_grad_updates = {'fields': ~
-                                self.zero_field, 'fields0': (~self.zero_field)}
+        self.do_grad_updates = {'fields': (not self.zero_field), 'fields0': (not self.zero_field)}
         self.do_grad_updates_batch_norm = self.do_grad_updates
         self.factors = [1]
 
@@ -608,6 +618,8 @@ class PottsLayer(Layer):
         return (mu,)
 
     def init_params_from_data(self, X, eps=1e-6, value='data', weights=None):
+        if self.zero_field:
+            return
         if X is None:
             self.fields = np.zeros(self.N, dtype=curr_float)
             self.fields0 = np.zeros(self.N, dtype=curr_float)
@@ -620,11 +632,15 @@ class PottsLayer(Layer):
             self.fields0 = self.fields.copy()
 
     def batch_norm_update(self, mu_I, I, **kwargs):
+        if self.zero_field:
+            return
         delta_mu_I = (mu_I - self.mu_I)
         self.mu_I = mu_I
         self.fields -= delta_mu_I
 
     def batch_norm_update_gradient(self, gradient_W, gradient_hlayer, V, I, mu, n_c, weights=None):
+        if self.zero_field:
+            return
         add_to_gradient(gradient_W, gradient_hlayer['fields'], -mu)
         return
 
@@ -1413,8 +1429,8 @@ class Bernoulli_coupledLayer(Layer):
         self.params_anneal = {'fields': True, 'couplings': True}
         self.params_newaxis = {'fields': False, 'couplings': False}
 
-        self.do_grad_updates = {'fields':  ~self.zero_field, 'couplings': True,
-                                'fields0': ~self.zero_field, 'couplings0': False}
+        self.do_grad_updates = {'fields':  (not self.zero_field), 'couplings': True,
+                                'fields0': (not self.zero_field), 'couplings0': False}
         self.do_grad_updates_batch_norm = self.do_grad_updates
 
     def sample_from_inputs(self, I, I0=None, beta=1, previous=(None, None), **kwargs):
@@ -1514,8 +1530,8 @@ class Spin_coupledLayer(Layer):
         self.params_anneal = {'fields': True, 'couplings': True}
         self.params_newaxis = {'fields': False, 'couplings': False}
 
-        self.do_grad_updates = {'fields': ~zero_field, 'couplings': True,
-                                'fields0': ~zero_field, 'couplings0': False}
+        self.do_grad_updates = {'fields': (not zero_field), 'couplings': True,
+                                'fields0': (not zero_field), 'couplings0': False}
         self.do_grad_updates_batch_norm = self.do_grad_updates
 
     def sample_from_inputs(self, I, I0=None, beta=1, previous=(None, None), **kwargs):
@@ -1618,8 +1634,8 @@ class Potts_coupledLayer(Layer):
         self.params_anneal = {'fields': True, 'couplings': True}
         self.params_newaxis = {'fields': False, 'couplings': False}
 
-        self.do_grad_updates = {'fields': self.zero_field, 'couplings': True,
-                                'fields0': self.zero_field, 'couplings0': False}
+        self.do_grad_updates = {'fields': (not self.zero_field), 'couplings': True,
+                                'fields0': False, 'couplings0': False}
         self.do_grad_updates_batch_norm = self.do_grad_updates
 
     def sample_from_inputs(self, I, I0=None, beta=1, previous=(None, None), **kwargs):
