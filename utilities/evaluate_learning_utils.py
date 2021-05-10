@@ -41,14 +41,21 @@ def aa_color_scatter(letter):
 
 
 
-def assess_moment_matching(RBM, data, data_gen,datah_gen=None, weights=None,with_reg=True,show=True):
+def assess_moment_matching(RBM, data, data_gen,datah_gen=None, weights=None,weights_neg=None,with_reg=True,show=True):
     h_data = RBM.mean_hiddens(data)
-    h_gen = RBM.mean_hiddens(data_gen)
+    if datah_gen is not None:
+        h_gen = datah_gen
+    else:
+        h_gen = RBM.mean_hiddens(data_gen)
     mu = utilities.average(data,c=RBM.n_cv,weights=weights)
-    mu_gen = utilities.average(data_gen,c=RBM.n_cv)
+    if datah_gen is not None:
+        condmu_gen = RBM.mean_visibles(datah_gen)
+        mu_gen = utilities.average(condmu_gen,weights=weights_neg)
+    else:
+        mu_gen = utilities.average(data_gen,c=RBM.n_cv,weights=weights_neg)
 
     mu_h = utilities.average(h_data,weights=weights)
-    mu_h_gen = h_gen.mean(0)
+    mu_h_gen = utilities.average(h_gen,weights=weights_neg)
 
     if RBM.n_cv>1:
         cov_vh = utilities.average_product(h_data,data,c2=RBM.n_cv,weights=weights) - mu[np.newaxis,:,:] * mu_h[:,np.newaxis,np.newaxis]
@@ -57,16 +64,15 @@ def assess_moment_matching(RBM, data, data_gen,datah_gen=None, weights=None,with
 
 
     if datah_gen is not None:
-        mu_data_gen = RBM.mean_visibles(datah_gen)
         if RBM.n_cv>1:
-            cov_vh_gen = utilities.average_product(datah_gen, mu_data_gen, mean2=True,c2=RBM.n_cv) - mu[np.newaxis,:,:] * mu_h[:,np.newaxis,np.newaxis]
+            cov_vh_gen = utilities.average_product(datah_gen, condmu_gen, mean2=True,c2=RBM.n_cv,weights=weights_neg) - mu_gen[np.newaxis,:,:] * mu_h_gen[:,np.newaxis,np.newaxis]
         else:
-            cov_vh_gen = utilities.average_product(datah_gen, mu_data_gen, mean2=True,c2=RBM.n_cv) - mu[np.newaxis,:] * mu_h[:,np.newaxis]
+            cov_vh_gen = utilities.average_product(datah_gen, condmu_gen, mean2=True,c2=RBM.n_cv,weights=weights_neg) - mu_gen[np.newaxis,:] * mu_h_gen[:,np.newaxis]
     else:
         if RBM.n_cv>1:
-            cov_vh_gen = utilities.average_product(h_gen,data_gen,c2=RBM.n_cv) - mu_gen[np.newaxis,:,:] * mu_h_gen[:,np.newaxis,np.newaxis]
+            cov_vh_gen = utilities.average_product(h_gen,data_gen,c2=RBM.n_cv,weights=weights_neg) - mu_gen[np.newaxis,:,:] * mu_h_gen[:,np.newaxis,np.newaxis]
         else:
-            cov_vh_gen = utilities.average_product(h_gen,data_gen,c2=RBM.n_cv) - mu_gen[np.newaxis,:] * mu_h_gen[:,np.newaxis]
+            cov_vh_gen = utilities.average_product(h_gen,data_gen,c2=RBM.n_cv,weights=weights_neg) - mu_gen[np.newaxis,:] * mu_h_gen[:,np.newaxis]
 
 
     if RBM.hidden == 'dReLU':
@@ -80,10 +86,10 @@ def assess_moment_matching(RBM, data, data_gen,datah_gen=None, weights=None,with
         mu2_n_pos = utilities.average(mu2_n_pos,weights=weights)
 
         mu_p_neg,mu_n_neg,mu2_p_neg,mu2_n_neg = RBM.hlayer.mean12_pm_from_inputs(I_gen)
-        mu_p_neg = utilities.average(mu_p_neg)
-        mu_n_neg = utilities.average(mu_n_neg)
-        mu2_p_neg = utilities.average(mu2_p_neg)
-        mu2_n_neg = utilities.average(mu2_n_neg)
+        mu_p_neg = utilities.average(mu_p_neg,weights=weights_neg)
+        mu_n_neg = utilities.average(mu_n_neg,weights=weights_neg)
+        mu2_p_neg = utilities.average(mu2_p_neg,weights=weights_neg)
+        mu2_n_neg = utilities.average(mu2_n_neg,weights=weights_neg)
 
         a = RBM.hlayer.gamma
         eta = RBM.hlayer.eta

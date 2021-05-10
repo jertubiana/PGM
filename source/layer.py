@@ -834,7 +834,7 @@ class ReLUplusLayer(Layer):
             self.get_params(beta=beta)
             return (config**2 * self._gamma).sum(-1) / 2 + (config * self._theta).sum(-1)
 
-    def get_moments(self, data, I0=None, value='input', weights=None, average=False, beta=1):  # Gaussian, ReLU+
+    def get_moments(self, data, I0=None, value='input', weights=None, beta=1):  # Gaussian, ReLU+
         if value == 'input':
             mu2 = average(self.mean2_from_inputs(
                 data, I0=I0, beta=beta), weights=weights)

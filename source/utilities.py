@@ -19,7 +19,6 @@ import numba_utilities as cy_utilities
 from float_precision import double_precision, curr_float, curr_int
 use_numba = True
 
-
 def check_random_state(seed):
     if seed == None or seed == np.random:
         return np.random.mtrand._rand
@@ -368,22 +367,16 @@ def copy_config(config, N_PT=1, record_replica=False):
             return config.copy()
 
 
-def make_all_discrete_configs(N, nature, c=1):
-    iter_configurations = []
+def make_all_discrete_configs(M,nature,c=1):
     if nature == 'Bernoulli':
-        string = ','.join(['[0,1]' for _ in range(N)])
-        exec('iter_configurations=itertools.product(%s)' % string)
+        configurations = np.stack(np.meshgrid(*[[0,1] for _ in range(M)]),axis=-1).reshape([-1,M])
     elif nature == 'Spin':
-        string = ','.join(['[-1,1]' for _ in range(N)])
-        exec('iter_configurations=itertools.product(%s)' % string)
+        configurations = np.stack(np.meshgrid(*[[-1,1] for _ in range(M)]),axis=-1).reshape([-1,M])
     elif nature == 'Potts':
-        liste_configs = '[' + ','.join([str(c) for c in range(c)]) + ']'
-        string = ','.join([liste_configs for _ in range(N)])
-        exec('iter_configurations=itertools.product(%s)' % string)
+        configurations = np.stack(np.meshgrid(*[range(c) for _ in range(M)]),axis=-1).reshape([-1,M])
     else:
         print('no supported')
-    configurations = np.array([config for config in iter_configurations])
-    return configurations
+    return configurations.astype(curr_int)
 
 
 def add_to_gradient(grad_x, grad_y, dy_dx):

@@ -1085,7 +1085,7 @@ class RBM(pgm.PGM):
                 H_neg = self.fantasy_h[0]
             else:
                 H_neg = self.fantasy_h
-            I_neg = self.hlayer.compute_out(
+            I_neg = self.hlayer.compute_output(
                 H_neg, self.weights, direction='down')
         else:
             if self.N_PT > 1:
