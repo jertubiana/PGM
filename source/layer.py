@@ -821,9 +821,10 @@ class ReLUplusLayer(Layer):
         I_plus = (-I + self._theta) / np.sqrt(self._gamma)
         rmin = erf(I_plus / np.sqrt(2))
         rmax = 1
-        tmp = (rmax - rmin > 1e-14)
+        tmp = (rmax - rmin < 1e-14)
         h = (np.sqrt(2) * erfinv(rmin + (rmax - rmin) * self.random_state.random_sample(
             size=I.shape).astype(curr_float)) - I_plus) / np.sqrt(self._gamma)
+        h = np.maximum(h,0) # Due to numerical error of erfinv, erf,  erfinv(rmin) is not exactly I_plus/sqrt(2).
         h[np.isinf(h) | np.isnan(h) | tmp] = 0
         return h
 

@@ -458,7 +458,7 @@ class RBM(pgm.PGM):
 
         if learning_rate is None:
             if self.optimizer in ['SGD', 'momentum']:
-                if self.hidden in ['Gaussian', 'ReLU+', 'ReLU', 'dReLU']:
+                if self.hidden in ['Gaussian', 'ReLUplus', 'ReLU', 'dReLU']:
                     if self.batch_norm:
                         learning_rate = 0.05
                     else:
@@ -467,7 +467,10 @@ class RBM(pgm.PGM):
                     learning_rate = 0.05
 
             elif self.optimizer == 'ADAM':
-                learning_rate = 5e-3
+                if self.visible in ['Gaussian','ReLUplus','ReLU','dReLU']:
+                    learning_rate = 1e-3
+                else:
+                    learning_rate = 5e-3
             else:
                 print('Need to specify learning rate for optimizer.')
 
