@@ -197,9 +197,9 @@ def gen_data_lowT(RBM, beta=1, which = 'marginal' ,**generation_options):
     if which == 'joint':
         tmp_RBM = copy.deepcopy(RBM)
         tmp_RBM.weights *= beta
-        for param_name in tmp_RBM.vlayer.params:
+        for param_name in tmp_RBM.vlayer.list_params:
             tmp_RBM.vlayer.__dict__[param_name] *= beta
-        for param_name in tmp_RBM.hlayer.params:
+        for param_name in tmp_RBM.hlayer.list_params:
             tmp_RBM.hlayer.__dict__[param_name] *= beta
 
     elif which == 'marginal':
