@@ -1,11 +1,18 @@
 # Probabilistic Graphical Models (PGM)
 
-![](figure_readme.png)
+![](figures/figure_readme.png)
 
-This repository consists high-level, object-oriented Python implementation of directed and undirected Probabilistic Graphical Models such as Restricted Boltzmann Machines (RBM), Boltzmann Machines (BM), Mixture of Independent (MoI), Generalized Linear Models (GLM). PGM was originally developed for analysis of discrete multidimensional biological data such as multiple sequence alignments of proteins or neural spike recordings, see references below.
+*Learning protein constitutive motifs from sequence data*
 
-In addition to the core algorithm, the repository contains preprocessing tools and visualization tools for protein sequence data; below is a short example of modeling protein sequence data:
+![](figures/figure_zebrafish.png)
 
+*Learning neural assemblies of larval zebrafish from whole-brain neural recordings. Credit: Thijs L. van der Plas*
+
+
+This repository consists of a high-level, object-oriented Python implementation of directed and undirected Probabilistic Graphical Models such as Restricted Boltzmann Machines (RBM), Boltzmann Machines (BM), Mixture of Independent (MoI), Generalized Linear Models (GLM).
+PGM is implemented using numpy and numba and runs on CPU. It was originally developed for analysis of discrete multidimensional biological data such as multiple sequence alignments of proteins or neural spike recordings, see references below.
+
+In addition to the core algorithm, the repository contains various preprocessing and visualization tools for protein sequence data; below is a short example of modeling protein sequence data:
 
 ```
 sequences = Proteins_utils.load_FASTA('data/WW/WW_domain_MSA.fasta') # Load protein sequences.
@@ -125,6 +132,26 @@ predicted analytically
   - MC sample generation.
   - Inference of couplings by pseudo-likelihood maximization.
   - Comparison at various sample sizes.
+  
+- **Neural recordings of larval zebrafish spontaneous activity**
+Light-sheet fluorescence microscopy is a novel imaging method for simultaneously recording the activity of whole brains of small vertebrae (larval zebrafish) at neuron scale (~40K neurons).
+The measured patterns of spontaneous activity reflect a stochastic exploration of the neuronal state space that is constrained by the underlying assembly organization of neurons. 
+    
+This notebook contains main instructions for reproducing the results presented in Ref. [10]. We use RBM to model eight such large-scale recordings. We:
+  -  Infer $\sim\!200$ neural assemblies, which are physiologically meaningful and whose various combinations form successive brain states.
+  -  Accurately reproduce the mean activity and pairwise correlation statistics of the recordings despite limited number of parameters.
+  -  Mathematically derive an interregional functional connectivity matrix, which is conserved across individual animals and correlates well with structural connectivity.
+
+Data and pretrained models must be downloaded from the following repository: https://gin.g-node.org
+
+For running this notebook, the following packages must be installed:
+Seaborn; usually installed by default, otherwise:  ```pip install seaborn```
+h5py; usually installed by default, otherwise: ```pip install h5py```
+Ipyvolume: follow installation here: https://ipyvolume.readthedocs.io/en/latest/install.html
+
+This notebook provides basic data visualization plots. For best visualizations, we strongly recommend using the Fishualizer package (https://bitbucket.org/benglitz/fishualizer_public/) developed by Thijs van der Plas for optimal visualization of the recording and learnt weights.
+Instructions for interfacing the PGM and Fishualizer packages are provided at the end of the notebook. 
+
 
 
 ## References:
@@ -137,5 +164,7 @@ Articles using this package or a previous version.
 4. Tubiana, J., Cocco, S., & Monasson, R. (2019). Learning compositional representations of interacting systems with restricted boltzmann machines: Comparative study of lattice proteins. Neural computation, 31(8), 1671-1717.  
 5. Rizzato, F., Coucke, A., de Leonardis, E., Barton, J. P., Tubiana, J., Monasson, R., & Cocco, S. (2020). Inference of compressed Potts graphical models. Physical Review E, 101(1), 012309. (only likelihood and entropy estimation)  
 6. Harsh, M., Tubiana, J., Cocco, S., & Monasson, R. (2020). ‘Place-cell’emergence and learning of invariant data with restricted Boltzmann machines: breaking and dynamical restoration of continuous symmetries in the weight space. Journal of Physics A: Mathematical and Theoretical, 53(17), 174002.
-
-7. Bravi, B., Tubiana, J., Cocco, S., Monasson, R., Mora, T., & Walczak, A. M. (2020). Flexible machine learning prediction of antigen presentation for rare and common HLA-I alleles. bioRxiv.
+7. Bravi, B., Tubiana, J., Cocco, S., Monasson, R., Mora, T., & Walczak, A. M. (2021). RBM-MHC: A Semi-Supervised Machine-Learning Method for Sample-Specific Prediction of Antigen Presentation by HLA-I Alleles. Cell systems, 12(2), 195-202.
+8. Bravi, B., Balachandran, V. P., Greenbaum, B. D., Walczak, A. M., Mora, T., Monasson, R., & Cocco, S. (2021). Probing T-cell response by sequence-based probabilistic modeling. PLoS computational biology, 17(9), e1009297.
+9. Roussel, C., Cocco, S., & Monasson, R. (2021). Barriers and dynamical paths in alternating Gibbs sampling of restricted Boltzmann machines. Physical Review E, 104(3), 034109.
+10. van der Plas, T., Tubiana, J., Le Goc, G., Migault, G., Kunst, M., Baier, H., Bormuth, V., Englitz, B. & Debregeas, G. (2021) Compositional restricted boltzmann machines unveil the brain-wide organization of neural assemblies, bioRxiv
