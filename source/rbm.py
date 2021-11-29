@@ -1295,6 +1295,9 @@ class RBM(pgm.PGM):
         self.vlayer.ensure_constraints()
         self.hlayer.ensure_constraints()
 
+        if self.n_cv>1:
+            self.vlayer.fields -= self.vlayer.fields.mean(-1,keepdims=True)
+
         if check_nan(self.hlayer.__dict__, what='hlayer', location='after recompute parameters'):
             return False
 
