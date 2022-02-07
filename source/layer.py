@@ -1698,11 +1698,11 @@ class Potts_coupledLayer(Layer):
     # PottsCoupled.
     def get_moments(self, data, I0=None, value='input', weights=None, beta=1):
         if value == 'input':
-            print('get moments from input not supported SpinCoupled')
+            print('get moments from input not supported PottsCoupled')
             return
         elif value == 'data':
             mu = average(data, weights=weights, c=self.n_c)
-            comu = average_product(data, data, weights=weights, c=self.n_c)
+            comu = average_product(data, data, weights=weights, c1=self.n_c,c2=self.n_c)
         return (mu, comu)
 
     def internal_gradients(self, *args,l2=0, l1=0, **kwargs):  # Potts_coupled:
