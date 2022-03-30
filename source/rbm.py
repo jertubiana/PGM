@@ -494,9 +494,8 @@ class RBM(pgm.PGM):
         data = np.asarray(data, dtype=self.vlayer.type, order="c")
         if weights is not None:
             weights = np.asarray(weights, dtype=curr_float)
-        if self.batch_norm:
-            self.mu_data = utilities.average(
-                data, c=self.n_cv, weights=weights)
+        self.mu_data = utilities.average(
+            data, c=self.n_cv, weights=weights)
         self.moments_data = self.vlayer.get_moments(
             data,  value='data', weights=weights, beta=1)
 
@@ -519,12 +518,14 @@ class RBM(pgm.PGM):
 
         if init != 'previous':
             norm_init = np.sqrt(0.1 / self.n_v)
-
             self.init_weights(norm_init)
             if init == 'independent':
                 self.vlayer.init_params_from_data(
                     self.moments_data, eps=epsilon, value='moments')
             self.hlayer.init_params_from_data(None)
+        else:
+            if self.batch_norm:
+                self.hlayer.mu_I = utilities.average(self.input_hiddens(data),weights=weights)
 
         if (bool(MoI) | bool(MoI_h)) & (N_PT == 1):
             adapt_PT = True

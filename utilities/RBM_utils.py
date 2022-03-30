@@ -336,3 +336,22 @@ def swap_sign_RBM(RBM):
     RBM2.hlayer.recompute_params(which='others')
     RBM2.fantasy_h *= -1
     return RBM2
+
+
+def fast_pseudolikelihood(v,RBM,batch_size=100): # For proteins only.
+    PL = []
+    B = v.shape[0]
+    nbatches = int(np.ceil(B/batch_size))
+    for b in range(nbatches):
+        v_ = v[b*batch_size: min( (b+1) * batch_size, B) ]
+        B_ = min( (b+1) * batch_size, B) - b*batch_size
+        I = RBM.input_hiddens(v_)
+        mean_h = RBM.hlayer.mean_from_inputs(I)
+        condvar_h = RBM.hlayer.var_from_inputs(I)
+
+        g_eff = RBM.vlayer.fields + RBM.hlayer.compute_output(mean_h,RBM.weights,direction='down') # B X N X n_c
+        denominator = g_eff - g_eff[np.repeat(np.arange(B_)[:,np.newaxis],RBM.n_v,axis=1),np.repeat(np.arange(RBM.n_v)[np.newaxis,:],B_,axis=0),v_][:,:,np.newaxis]
+        denominator += (condvar_h.T[:,:,np.newaxis,np.newaxis] *  (RBM.weights[:,np.newaxis,:,:] - RBM.weights[:, np.repeat(np.arange(RBM.n_v)[np.newaxis],B_,axis=0) ,v_][...,np.newaxis])**2).sum(0)
+        PL.append( -utilities.logsumexp(denominator,axis=-1).mean(1) )
+    PL = np.concatenate(PL)
+    return PL

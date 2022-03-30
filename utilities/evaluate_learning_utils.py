@@ -107,6 +107,7 @@ def assess_moment_matching(RBM, data, data_gen,datah_gen=None, weights=None,weig
 
     W = RBM.weights
     if with_reg:
+        l2_fields = RBM.tmp_l2_fields
         l2 = RBM.l2
         l1 = RBM.l1
         l1b = RBM.l1b
@@ -114,6 +115,8 @@ def assess_moment_matching(RBM, data, data_gen,datah_gen=None, weights=None,weig
         l1_custom = RBM.l1_custom
         l1b_custom = RBM.l1b_custom
         n_c2 = RBM.n_cv
+        if l2_fields>0:
+            mu_gen += l2_fields * RBM.vlayer.fields
         if l2>0:
             cov_vh_gen += l2 * W
         if l1>0:

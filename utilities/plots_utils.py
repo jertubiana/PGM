@@ -532,39 +532,40 @@ def make_all_weights(RBM,data, pdb_file = None, pdb_chain=None, subset=None,name
 
 
         for i in range(k*weights_per_page,(k+1)*weights_per_page):
-            ii = i%weights_per_page
-            if (rows_per_weight>1) & (pdb_file is not None):
-                ax1 = [fig.add_subplot(gs[2*rows_per_weight*ii+2*l:2*rows_per_weight*ii+2*(l+1), 0]) for l in range(rows_per_weight)]
-                ax2 = fig.add_subplot(gs[2*ii*rows_per_weight:(2*ii+1)*rows_per_weight, 1])
-                ax3 = fig.add_subplot(gs[(2*ii+1) * rows_per_weight: 2*(ii+1) * rows_per_weight, 1])
-                ax4 = fig.add_subplot(gs[2*ii * rows_per_weight: 2*(ii+1) * rows_per_weight, 2])
-            elif (rows_per_weight==1) & (pdb_file is not None):
-                ax1 = fig.add_subplot(gs[2*ii:2*ii+2, 0])
-                ax2 = fig.add_subplot(gs[2*ii, 1])
-                ax3 = fig.add_subplot(gs[2*ii+1, 1])
-                ax4 = fig.add_subplot(gs[2*ii:2*ii+2, 2])
-            elif (rows_per_weight>1) & (pdb_file is None):
-                ax1 = [fig.add_subplot(gs[2*rows_per_weight*ii+2*l:2*rows_per_weight*ii+2*(l+1), 0]) for l in range(rows_per_weight)]
-                ax2 = fig.add_subplot(gs[2*ii*rows_per_weight:(2*ii+1)*rows_per_weight, 1])
-                ax3 = fig.add_subplot(gs[(2*ii+1) * rows_per_weight: 2*(ii+1) * rows_per_weight, 1])
-            else:
-                ax1 = fig.add_subplot(gs[2*ii:2*ii+2, 0])
-                ax2 = fig.add_subplot(gs[2*ii, 1])
-                ax3 = fig.add_subplot(gs[2*ii+1, 1])
+            if i< n_h_shown:
+                ii = i%weights_per_page
+                if (rows_per_weight>1) & (pdb_file is not None):
+                    ax1 = [fig.add_subplot(gs[2*rows_per_weight*ii+2*l:2*rows_per_weight*ii+2*(l+1), 0]) for l in range(rows_per_weight)]
+                    ax2 = fig.add_subplot(gs[2*ii*rows_per_weight:(2*ii+1)*rows_per_weight, 1])
+                    ax3 = fig.add_subplot(gs[(2*ii+1) * rows_per_weight: 2*(ii+1) * rows_per_weight, 1])
+                    ax4 = fig.add_subplot(gs[2*ii * rows_per_weight: 2*(ii+1) * rows_per_weight, 2])
+                elif (rows_per_weight==1) & (pdb_file is not None):
+                    ax1 = fig.add_subplot(gs[2*ii:2*ii+2, 0])
+                    ax2 = fig.add_subplot(gs[2*ii, 1])
+                    ax3 = fig.add_subplot(gs[2*ii+1, 1])
+                    ax4 = fig.add_subplot(gs[2*ii:2*ii+2, 2])
+                elif (rows_per_weight>1) & (pdb_file is None):
+                    ax1 = [fig.add_subplot(gs[2*rows_per_weight*ii+2*l:2*rows_per_weight*ii+2*(l+1), 0]) for l in range(rows_per_weight)]
+                    ax2 = fig.add_subplot(gs[2*ii*rows_per_weight:(2*ii+1)*rows_per_weight, 1])
+                    ax3 = fig.add_subplot(gs[(2*ii+1) * rows_per_weight: 2*(ii+1) * rows_per_weight, 1])
+                else:
+                    ax1 = fig.add_subplot(gs[2*ii:2*ii+2, 0])
+                    ax2 = fig.add_subplot(gs[2*ii, 1])
+                    ax3 = fig.add_subplot(gs[2*ii+1, 1])
 
-            sequence_logo.Sequence_logo(RBM.weights[order[i]],ax=ax1,
-                ylabel = ylabels[i], title=titles[i]
-                ,ticks_every=ticks_every,ticks_labels_size=14,title_size=20,show=False,nrows=rows_per_weight)
+                sequence_logo.Sequence_logo(RBM.weights[order[i]],ax=ax1,
+                    ylabel = ylabels[i], title=titles[i]
+                    ,ticks_every=ticks_every,ticks_labels_size=14,title_size=20,show=False,nrows=rows_per_weight)
 
-            plot_input_mean(RBM,I, order[i], I_range=I_range,mean=mean,weights = weights, ax = ax2,xlabels=[r'$I_{%s}$'%(i+1)])
+                plot_input_mean(RBM,I, order[i], I_range=I_range,mean=mean,weights = weights, ax = ax2,xlabels=[r'$I_{%s}$'%(i+1)])
 
-            plot_top_activating_distance(RBM, I, None,order[i], nseqs = 20,all_distances = all_distances, distance_top_features = distance_top_features,ax=ax3,xlabels=['Hamming Distance'])
-            if pdb_file is not None:
-                img = mpimg.imread(structure_folder+'sector_' + sector_names[i] + '.png')
-                rows = (img.sum(-1) == 1.*3).min(1) # Remove white
-                cols = (img.sum(-1) == 1.*3).min(0)
-                ax4.imshow(img[~rows,:][:,~cols])
-                ax4.axis('off')
+                plot_top_activating_distance(RBM, I, None,order[i], nseqs = 20,all_distances = all_distances, distance_top_features = distance_top_features,ax=ax3,xlabels=['Hamming Distance'])
+                if pdb_file is not None:
+                    img = mpimg.imread(structure_folder+'sector_' + sector_names[i] + '.png')
+                    rows = (img.sum(-1) == 1.*3).min(1) # Remove white
+                    cols = (img.sum(-1) == 1.*3).min(0)
+                    ax4.imshow(img[~rows,:][:,~cols])
+                    ax4.axis('off')
 
         plt.tight_layout()
         fig.savefig(mini_name+'tmp_#%s.png'%k,dpi=dpi)
@@ -573,7 +574,7 @@ def make_all_weights(RBM,data, pdb_file = None, pdb_chain=None, subset=None,name
 
     command = 'pdfjoin ' + mini_name+'tmp_#*.png -o %s'%name
     os.system(command)
-    command = 'rm '+mini_name+'tmp_#*.png'
+    # command = 'rm '+mini_name+'tmp_#*.png'
     os.system(command)
     print('Make all weights: Done.')
     return 'done'

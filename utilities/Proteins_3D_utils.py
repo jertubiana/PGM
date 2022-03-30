@@ -25,7 +25,7 @@ import copy
 
 
 chimera_path = '/Applications/Chimera.app/Contents/MacOS/chimera' # Path to chimera command line executable.
-hmmer_path = '/Users/jerometubiana/Desktop/PhD/hmmer-3.2.1/' # Path to executables should be, for instance: hmmer_path+'src/hmmbuild'
+hmmer_path = '/Users/jerometubiana/Libraries/hmmer-3.3.2/' # Path to executables should be, for instance: hmmer_path+'src/hmmbuild'
 structures_folder = '/Volumes/Carte_SD/PDB_files/' # Where PDB files are stored locally.
 residue_dictionary = {'CYS': 'C', 'ASP': 'D', 'SER': 'S', 'GLN': 'Q', 'LYS': 'K',
                       'ILE': 'I', 'PRO': 'P', 'THR': 'T', 'PHE': 'F', 'ASN': 'N',
