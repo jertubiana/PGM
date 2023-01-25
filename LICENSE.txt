@@ -11,5 +11,6 @@
     # The publication of research using this software, modified or not, must include 
     # appropriate citations to:
     # Tubiana and Monasson, 2017, PRL (https://doi.org/10.1103/PhysRevLett.118.138301)
+    # Tubiana, Cocco, and Monasson 2019 Learning protein constitutive motifs from sequence data, eLife (https://elifesciences.org/articles/39397)
     # Van der Plas*, Tubiana* et al., 2023, elife (https://elifesciences.org/articles/83139)
     ##############################################################

@@ -136,7 +136,6 @@ predicted analytically
 - **Neural recordings of larval zebrafish spontaneous activity**
 Light-sheet fluorescence microscopy is a novel imaging method for simultaneously recording the activity of whole brains of small vertebrae (larval zebrafish) at neuron scale (~40K neurons).
 The measured patterns of spontaneous activity reflect a stochastic exploration of the neuronal state space that is constrained by the underlying assembly organization of neurons. 
-    
 This notebook contains main instructions for reproducing the results presented in Ref. [10]. We use RBM to model eight such large-scale recordings. We:
   -  Infer $\sim\!200$ neural assemblies, which are physiologically meaningful and whose various combinations form successive brain states.
   -  Accurately reproduce the mean activity and pairwise correlation statistics of the recordings despite limited number of parameters.
