@@ -159,12 +159,18 @@ Instructions for interfacing the PGM and Fishualizer packages are provided at th
 Articles using this package or a previous version.
 
 1. Tubiana, J., & Monasson, R. (2017). Emergence of compositional representations in restricted Boltzmann machines. Physical review letters, 118(13), 138301.  
-2. Cocco, S., Monasson, R., Posani, L., Rosay, S., & Tubiana, J. (2018). Statistical physics and representations in real and artificial neural networks. Physica A: Statistical Mechanics and its Applications, 504, 45-76.   
+2. Cocco, S., Monasson, R., Posani, L., Rosay, S., & Tubiana, J. (2018). Statistical physics and representations in real and artificial neural networks. Physica A: Statistical Mechanics and its Applications, 504, 45-76.
 3. Tubiana, J., Cocco, S., & Monasson, R. (2019). Learning protein constitutive motifs from sequence data. Elife, 8, e39397.  
-4. Tubiana, J., Cocco, S., & Monasson, R. (2019). Learning compositional representations of interacting systems with restricted boltzmann machines: Comparative study of lattice proteins. Neural computation, 31(8), 1671-1717.  
+4. Tubiana, J., Cocco, S., & Monasson, R. (2019). Learning compositional representations of interacting systems with restricted boltzmann machines: Comparative study of lattice proteins. Neural computation, 31(8), 1671-1717.
 5. Rizzato, F., Coucke, A., de Leonardis, E., Barton, J. P., Tubiana, J., Monasson, R., & Cocco, S. (2020). Inference of compressed Potts graphical models. Physical Review E, 101(1), 012309. (only likelihood and entropy estimation)  
 6. Harsh, M., Tubiana, J., Cocco, S., & Monasson, R. (2020). ‘Place-cell’emergence and learning of invariant data with restricted Boltzmann machines: breaking and dynamical restoration of continuous symmetries in the weight space. Journal of Physics A: Mathematical and Theoretical, 53(17), 174002.
 7. Bravi, B., Tubiana, J., Cocco, S., Monasson, R., Mora, T., & Walczak, A. M. (2021). RBM-MHC: A Semi-Supervised Machine-Learning Method for Sample-Specific Prediction of Antigen Presentation by HLA-I Alleles. Cell systems, 12(2), 195-202.
 8. Bravi, B., Balachandran, V. P., Greenbaum, B. D., Walczak, A. M., Mora, T., Monasson, R., & Cocco, S. (2021). Probing T-cell response by sequence-based probabilistic modeling. PLoS computational biology, 17(9), e1009297.
 9. Roussel, C., Cocco, S., & Monasson, R. (2021). Barriers and dynamical paths in alternating Gibbs sampling of restricted Boltzmann machines. Physical Review E, 104(3), 034109.
-10. van der Plas, T., Tubiana, J., Le Goc, G., Migault, G., Kunst, M., Baier, H., Bormuth, V., Englitz, B. & Debregeas, G. (2021) Compositional restricted boltzmann machines unveil the brain-wide organization of neural assemblies, bioRxiv
+10. Tubiana, J., Xiang, Y., Fan, L., Wolfson, H. J., Chen, K., Schneidman-Duhovny, D., & Shi, Y. (2022). Reduced antigenicity of Omicron lowers host serologic response. Cell reports, 41(3), 111512.
+11. Di Gioacchino, A., Procyk, J., Molari, M., Schreck, J. S., Zhou, Y., Liu, Y., ... & Šulc, P. (2022). Generative and interpretable machine learning for aptamer design and analysis of in vitro sequence selection. PLOS Computational Biology.
+12. Fernandez-de-Cossio-Diaz, J., Cocco, S., & Monasson, R. (2022). Disentangling representations in Restricted Boltzmann Machines without adversaries. arXiv preprint arXiv:2206.11600.
+13. Bravi, B., Di Gioacchino, A., Fernandez-de-Cossio-Diaz, J., Walczak, A. M., Mora, T., Cocco, S., & Monasson, R. (2022). Learning the differences: a transfer-learning approach to predict antigen immunogenicity and T-cell receptor specificity. bioRxiv, 2022-12.
+14. van der Plas, T., Tubiana, J., Le Goc, G., Migault, G., Kunst, M., Baier, H., Bormuth, V., Englitz, B. & Debregeas, G. (2023) Compositional restricted boltzmann machines unveil the brain-wide organization of neural assemblies, eLife 12:e83139
+15. Roussel, C., Fernandez-De-Cossio-Diaz, J., Cocco, S., & Monasson, R. (2023). Deep Tempering with Nested Restricted Boltzmann Machines.
+16. Tubiana, J., Adriana-Lifshits, L., Nissan, M., Gabay, M. , Sher, I., Sova, M., Wolfson, H. J., and Gal, M., “Funneling inhibitory peptide design with generative models: discovery and characterization of disruptors of Calcineurin protein-protein interactions,” PLOS Computational Biology, 2023.
