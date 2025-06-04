@@ -236,7 +236,7 @@ def plot_input_classes_scatter(subsets,I_background, I_classes, class_names=None
 
     for l in range(nfeatures):
         ax_ = get_ax(ax,l,nrows,ncols)
-        row = l/ncols
+        row = l//ncols
         col = l%ncols
         i = subsets[l][0]
         j = subsets[l][1]
@@ -441,7 +441,7 @@ def make_all_weights(RBM,data, pdb_file = None, pdb_chain=None, subset=None,name
         importance = RBM_utils.get_hidden_unit_importance(RBM,data,weights=weights)
         sorting_value = importance
     else:
-        sorting_value = np.arange(n_h)
+        sorting_value = np.arange(n_h)[::-1]
 
     if gap_at_bottom:
         gap_fraction = RBM_utils.get_norm_gaps(RBM.weights,a=1)/RBM_utils.get_norm(RBM.weights,a=1)
